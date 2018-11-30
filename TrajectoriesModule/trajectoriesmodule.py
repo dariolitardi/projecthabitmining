@@ -19,8 +19,6 @@ def CalcolaMinimoTimestamp(listatimestamp):
     timestampmin = datetime.strptime(tm,("%H:%M:%S"))
     c=0
     for i in range(1, len(listatimestamp)):
-        if(len(listatimestamp)-1==1):
-            break
         parsedstring2 = listatimestamp[i].split(',')
         idfilemin2 = parsedstring2[1]
         tm2 = parsedstring2[0]
@@ -32,7 +30,6 @@ def CalcolaMinimoTimestamp(listatimestamp):
             c=i
             idfilemin= idfilemin2
             posizionemin=posizionemin2
-
 
 
     s= timestampmin.strftime("%H:%M:%S")+","+str(c)+","+str(idfilemin)+","+ posizionemin
@@ -56,6 +53,11 @@ def goto(linenum):
 
 
 def main():
+    exists = os.path.isfile(("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt"))
+    if exists:
+        os.remove("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt")
+
+
     path= "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\*.txt"
 
 
@@ -96,17 +98,22 @@ def main():
         posizione=(parsedstring[3])
 
         ##scrivi tsminimo in log
+
         datasetfile.write(timestampmin+" "+posizione)
+
 
         ##rimuovo tsmin da listapuntatorilinee
         ##file tsminimo leggo una nuova linea e lo schiaffo in listapuntatorilinee
         parsedline=listafile[idfiletsminimo].readline().split(' ')
         line=parsedline[0]
 
-        if(line=="" and len(listapuntatorilinee)==0):
+        if(line=="" and len(listapuntatorilinee)!=0):
+            datasetfile.write("\n")
+        if (line == "" and len(listapuntatorilinee) == 0):
             return
         if (line != ""):
-            listapuntatorilinee.append(line+","+str(idfiletsminimo)+","+parsedline[1]+" "+parsedline[2])
+
+                listapuntatorilinee.append(line+","+str(idfiletsminimo)+","+parsedline[1]+" "+parsedline[2])
 
         del(listapuntatorilinee[filetsminimo])
 

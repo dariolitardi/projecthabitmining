@@ -38,10 +38,13 @@ def CalcolaMinimoTimestamp(listatimestamp):
 def LeggiLinea(listafile):
     listaPuntatori=list()
     for i in range(0, len(listafile)):
-        parsedline=listafile[i].readline().split(' ')
+        stringa= listafile[i].readline()
+        if (stringa == ""):
+            continue
+        parsedline=stringa.split(' ')
+
         linea =parsedline[0] + ","+str(i)+","+parsedline[1]+ " "+parsedline[2]
-        if (linea == ""):
-           continue
+
 
         listaPuntatori.append(linea)
     return listaPuntatori

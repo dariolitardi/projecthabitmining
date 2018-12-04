@@ -7,6 +7,7 @@ import random
 import math
 from datetime import datetime
 from datetime import timedelta
+import traj_reconstructor
 
 class Position:
      x = 0
@@ -60,6 +61,10 @@ def main():
     if exists:
         os.remove("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt")
 
+    exists = os.path.isfile(
+        ("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\trajectoriesDB.db"))
+    if exists:
+        os.remove("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\trajectoriesDB.db")
 
     path= "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\*.txt"
 
@@ -90,6 +95,7 @@ def main():
             j+=1
 
         if( not listapuntatorilinee):
+            traj_reconstructor.RecontructPathLogs()
             return
 
 
@@ -114,11 +120,13 @@ def main():
             datasetfile.write("\n")
         if (line == "" and len(listapuntatorilinee) == 0):
             return
+
         if (line != ""):
 
                 listapuntatorilinee.append(line+","+str(idfiletsminimo)+","+parsedline[1]+" "+parsedline[2])
 
         del(listapuntatorilinee[filetsminimo])
+
 
 
 

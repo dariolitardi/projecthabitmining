@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/traj_reconstructor.py" line="119" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="9a427eb9-e198-4a48-a081-912fba5630b3" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -12,12 +15,12 @@
     <session id="590247221">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="15" />
+          <entry key="project.closed" value="16" />
           <entry key="project.open.time.10" value="1" />
           <entry key="project.open.time.3" value="4" />
-          <entry key="project.open.time.4" value="11" />
+          <entry key="project.open.time.4" value="12" />
           <entry key="project.open.time.5" value="3" />
-          <entry key="project.opened" value="19" />
+          <entry key="project.opened" value="20" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -35,12 +38,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="8030" />
+          <entry key="py" value="9221" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="8030" />
+          <entry key="Python" value="9221" />
         </counts>
       </usages-collector>
     </session>
@@ -50,7 +53,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/trajectoriesmodule.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="814">
+            <state relative-caret-position="1496">
               <caret line="97" column="51" selection-start-line="97" selection-start-column="51" selection-end-line="97" selection-end-column="51" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -62,11 +65,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/traj_reconstructor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1564">
-              <caret line="92" column="41" selection-start-line="92" selection-start-column="41" selection-end-line="92" selection-end-column="41" />
+            <state relative-caret-position="115">
+              <caret line="64" column="29" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <marker date="1543934702980" expanded="true" signature="442:444" ph="..." />
+                <marker date="1544021256540" expanded="true" signature="442:2930" ph="..." />
+                <marker date="1544021256540" expanded="true" signature="3384:4141" ph="..." />
               </folding>
             </state>
           </provider>
@@ -265,7 +269,7 @@
     <entry file="file://$USER_HOME$/Desktop/HomeDesigner/bin/Debug/Log/sim_354,471915566582/example.db" />
     <entry file="file://$PROJECT_DIR$/trajectoriesmodule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="814">
+        <state relative-caret-position="1496">
           <caret line="97" column="51" selection-start-line="97" selection-start-column="51" selection-end-line="97" selection-end-column="51" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
@@ -275,11 +279,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/traj_reconstructor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1564">
-          <caret line="92" column="41" selection-start-line="92" selection-start-column="41" selection-end-line="92" selection-end-column="41" />
+        <state relative-caret-position="115">
+          <caret line="64" column="29" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
-            <marker date="1543934702980" expanded="true" signature="442:444" ph="..." />
+            <marker date="1544021256540" expanded="true" signature="442:2930" ph="..." />
+            <marker date="1544021256540" expanded="true" signature="3384:4141" ph="..." />
           </folding>
         </state>
       </provider>

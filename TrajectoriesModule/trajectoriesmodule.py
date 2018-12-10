@@ -8,6 +8,7 @@ import math
 from datetime import datetime
 from datetime import timedelta
 import traj_reconstructor
+import trajectories_drawer
 
 class Position:
      x = 0
@@ -96,6 +97,8 @@ def main():
 
         if( not listapuntatorilinee):
             traj_reconstructor.RecontructPathLogs()
+            ##trajectories_drawer.TestApp().run()
+
             return
 
 

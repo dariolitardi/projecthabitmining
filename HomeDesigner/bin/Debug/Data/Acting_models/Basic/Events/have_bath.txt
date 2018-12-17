@@ -1,0 +1,11 @@
+have_bath BottomEvent
+
+PlusInterrupt 0
+
+Duration 20*60
+DurationDeviation 10*60
+
+MoveNoise 40
+
+Results
+water_use @(water_use)+$atstart()*(+10)+$atend()*(-10)+@(step)*(0)

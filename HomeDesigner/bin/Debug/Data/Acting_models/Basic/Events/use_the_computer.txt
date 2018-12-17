@@ -1,0 +1,12 @@
+use_the_computer BottomEvent
+
+PlusInterrupt 0
+
+Duration 5*60+115*60*@(c_pcl)
+DurationDeviation (5*60+115*60*@(c_pcl))/3
+
+MoveNoise 5
+
+Results
+pc_need @(pc_need)-@(pc_need)*$atend()
+a 2

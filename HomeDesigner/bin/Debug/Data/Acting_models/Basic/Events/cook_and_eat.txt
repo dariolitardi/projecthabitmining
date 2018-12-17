@@ -1,0 +1,9 @@
+cook_and_eat MainEvent
+
+Priority $min(@(hunger)*(0.5+@(c_f))+$attime(13,2)*20-25+@(warm_food_need),100)
+
+Interrupt 80
+
+Flow  Simple
+go_fridge get_ingeredients_from_fridge go_kitchen_shelf get_ingeredients_from_shelf go_oven use_oven go_dining_table eat_warm_meal go_oven pack_food go_fridge put_meal_to_fridge plate_to_sink
+ ;Test ;comment.

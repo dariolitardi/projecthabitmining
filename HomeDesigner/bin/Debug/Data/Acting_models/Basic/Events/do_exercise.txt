@@ -1,0 +1,12 @@
+do_exercise BottomEvent
+
+PlusInterrupt 0
+
+Duration 30*60
+DurationDeviation 10*60
+
+MoveNoise 50
+
+Results
+exer_need @(exer_need)-@(exer_need)*$atend()
+a 2

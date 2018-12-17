@@ -1,0 +1,10 @@
+get_ingeredients_from_shelf BottomEvent
+
+PlusInterrupt 0
+
+Duration 120
+DurationDeviation 30
+
+MoveNoise 20
+
+Results

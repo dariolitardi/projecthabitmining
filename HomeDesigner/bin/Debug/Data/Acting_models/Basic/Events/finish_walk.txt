@@ -1,0 +1,11 @@
+finish_walk BottomEvent
+
+PlusInterrupt 0
+
+Duration 10
+DurationDeviation 0
+
+MoveNoise 10
+
+Results
+walk_need @(walk_need)-@(walk_need)*$atend()

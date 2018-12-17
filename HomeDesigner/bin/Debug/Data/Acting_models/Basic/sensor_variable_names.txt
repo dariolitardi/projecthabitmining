@@ -1,0 +1,5 @@
+pressure_bed
+power_use
+water_use
+fridge_door_contact
+;since_post

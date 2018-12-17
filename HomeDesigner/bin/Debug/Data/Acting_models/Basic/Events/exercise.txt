@@ -1,0 +1,8 @@
+exercise MainEvent
+
+Priority @(exer_need)*4+$attime(9,2)*20
+
+Interrupt 50
+
+Flow  Simple
+go_exercise_place do_exercise

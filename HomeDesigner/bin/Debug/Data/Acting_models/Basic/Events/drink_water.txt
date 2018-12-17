@@ -1,0 +1,13 @@
+drink_water BottomEvent
+
+PlusInterrupt 0
+
+Duration @(thirst)/50*60
+DurationDeviation 10
+
+MoveNoise 10
+
+Results
+drink @(drink)+50/1/60
+thirst @(thirst)-@(thirst)*$atend()
+a 30/@(step)

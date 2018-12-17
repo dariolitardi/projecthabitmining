@@ -1,0 +1,11 @@
+get_food_from_fridge BottomEvent
+
+PlusInterrupt 0
+
+Duration 60
+DurationDeviation 20
+
+MoveNoise 20
+
+Results
+fridge_door_contact @(fridge_door_contact)-$atstart()+$atend()

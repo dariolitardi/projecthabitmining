@@ -1,0 +1,8 @@
+do_the_dishes MainEvent
+
+Priority @(unwashed_dishes)*10*(@(c_wd)*2)
+
+Interrupt 50
+
+Flow  Simple
+go_kitchen_sink wash_dishes

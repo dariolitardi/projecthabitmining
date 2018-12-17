@@ -1,0 +1,11 @@
+use_micro BottomEvent
+
+PlusInterrupt 0
+
+Duration 2*60
+DurationDeviation 30
+
+MoveNoise 20
+
+Results
+power_use @(power_use)+$atstart()*(600)+$atend()*(-600)+@(step)*(0)

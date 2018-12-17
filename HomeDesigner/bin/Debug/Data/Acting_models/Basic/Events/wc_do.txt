@@ -1,0 +1,12 @@
+wc_do BottomEvent
+
+PlusInterrupt 200
+
+Duration @(wc_need)/100*5*60
+DurationDeviation 0
+
+MoveNoise 10
+
+Results
+wc_use @(wc_use)+1
+a 3

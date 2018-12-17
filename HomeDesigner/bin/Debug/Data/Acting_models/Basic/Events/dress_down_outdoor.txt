@@ -1,0 +1,10 @@
+dress_down_outdoor BottomEvent
+
+PlusInterrupt 0
+
+Duration 5*60
+DurationDeviation 60
+
+MoveNoise 20
+
+Results

@@ -1,0 +1,10 @@
+get_glass BottomEvent
+
+PlusInterrupt 0
+
+Duration 10
+DurationDeviation 5
+
+MoveNoise 20
+
+Results

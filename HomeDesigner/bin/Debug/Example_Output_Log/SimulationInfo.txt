@@ -1,0 +1,13 @@
+Simulation name: sim_01
+
+Acting model: Basic
+Human model: Active
+House model: Large_Home
+
+Simualtion length: 4 days
+Simualtion stepsize: 10 seconds
+
+Simulation starting date: 2010.01.01.
+
+Simulation started at 2013.07.12.19:31:03.
+Simulation finished at 2013.07.12.19:33:21.

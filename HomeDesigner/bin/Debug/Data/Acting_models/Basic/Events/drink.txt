@@ -1,0 +1,8 @@
+drink MainEvent
+
+Priority @(thirst)*(0.5+@(c_d))
+
+Interrupt 150
+
+Flow  Simple
+go_kitchen_shelf get_glass go_kitchen_sink get_water drink_water

@@ -1,0 +1,11 @@
+switch_tv_on BottomEvent
+
+PlusInterrupt 0
+
+Duration 5
+DurationDeviation 0
+
+MoveNoise 20
+
+Results
+power_use @(power_use)+$atstart()*(80)+$atend()*(0)+@(step)*(0)

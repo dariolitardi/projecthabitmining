@@ -1,0 +1,11 @@
+wc_flush BottomEvent
+
+PlusInterrupt 0
+
+Duration 30
+DurationDeviation 0
+
+MoveNoise 20
+
+Results
+water_use @(water_use)+$atstart()*(+10)+$atend()*(-10)+@(step)*(0)

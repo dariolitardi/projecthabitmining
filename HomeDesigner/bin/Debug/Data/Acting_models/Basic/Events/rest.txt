@@ -1,0 +1,9 @@
+rest MainEvent
+
+Priority 20
+
+Interrupt 20
+
+Flow  Simple
+go_chair rest_in_chair
+ ;default ;event

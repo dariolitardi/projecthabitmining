@@ -1,0 +1,13 @@
+eat_cold_meal BottomEvent
+
+PlusInterrupt 50
+
+Duration @(hunger)/20*10*60
+DurationDeviation 60
+
+MoveNoise 10
+
+Results
+eat @(eat)+20/10/60
+food @(food)-20/50/60*@(step)
+a 1

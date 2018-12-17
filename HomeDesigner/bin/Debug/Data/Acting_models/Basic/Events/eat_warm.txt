@@ -1,0 +1,8 @@
+eat_warm MainEvent
+
+Priority @(hunger)*(0.5+@(c_f))+$attime(13,2)*20-24+@(warm_food_need)-(@(cooked_food)<0.5)*1000
+
+Interrupt 80
+
+Flow  Simple
+go_bathroom_sink wash_hands go_fridge get_cold_warm_food go_micro use_micro go_dining_table eat_warm_meal plate_to_sink

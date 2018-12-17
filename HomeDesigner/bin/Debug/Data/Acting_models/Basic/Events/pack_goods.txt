@@ -1,0 +1,11 @@
+pack_goods BottomEvent
+
+PlusInterrupt 0
+
+Duration 5*60
+DurationDeviation 2*60
+
+MoveNoise 20
+
+Results
+food 150

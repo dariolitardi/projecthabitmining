@@ -1,0 +1,13 @@
+use_oven BottomEvent
+
+PlusInterrupt 150
+
+Duration 40*60
+DurationDeviation 10*60
+
+MoveNoise 30
+
+Results
+cooked_food @(cooked_food)+$atstart()*(0)+$atend()*(2)+@(step)*(0)
+power_use @(power_use)+$atstart()*(800)+$atend()*(-800)+@(step)*(0)
+a 1

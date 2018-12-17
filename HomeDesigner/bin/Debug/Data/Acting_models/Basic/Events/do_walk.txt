@@ -1,0 +1,8 @@
+do_walk MainEvent
+
+Priority @(walk_need)*6
+
+Interrupt 200
+
+Flow  Simple
+go_wardrobe change_clothes go_shoe_shelf dress_up_outdoor go_outside walk_outside go_shoe_shelf dress_down_outdoor go_wardrobe change_clothes finish_walk

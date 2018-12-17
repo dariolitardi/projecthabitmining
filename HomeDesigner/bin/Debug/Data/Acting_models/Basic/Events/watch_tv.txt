@@ -1,0 +1,8 @@
+watch_tv MainEvent
+
+Priority (@(bored)+$attime(18,4)*20)
+
+Interrupt 60
+
+Flow  Simple
+go_tv switch_tv_on go_tv_chair do_watch_tv go_tv switch_tv_off

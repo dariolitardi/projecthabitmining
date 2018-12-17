@@ -1,0 +1,14 @@
+eat_warm_meal BottomEvent
+
+PlusInterrupt 50
+
+Duration @(hunger)/20*10*60
+DurationDeviation 5*60
+
+MoveNoise 10
+
+Results
+eat @(eat)+20/10/60
+cooked_food @(cooked_food)+$atstart()*(0)+$atend()*(-1)+@(step)*(0)
+warm_food_need @(warm_food_need)-@(warm_food_need)*$atend()
+a 1

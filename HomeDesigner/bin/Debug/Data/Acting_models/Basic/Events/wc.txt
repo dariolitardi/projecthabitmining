@@ -1,0 +1,8 @@
+wc MainEvent
+
+Priority @(wc_need)*(0.5+@(c_wc))
+
+Interrupt 100
+
+Flow  Simple
+go_wc wc_do wc_flush go_bathroom_sink wash_hands

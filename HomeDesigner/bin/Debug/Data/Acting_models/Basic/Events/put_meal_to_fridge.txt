@@ -1,0 +1,10 @@
+put_meal_to_fridge BottomEvent
+
+PlusInterrupt 0
+
+Duration 2*60
+DurationDeviation 20
+
+MoveNoise 20
+
+Results

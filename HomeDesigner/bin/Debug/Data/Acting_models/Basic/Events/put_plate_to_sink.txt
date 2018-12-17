@@ -1,0 +1,11 @@
+put_plate_to_sink BottomEvent
+
+PlusInterrupt 0
+
+Duration 20
+DurationDeviation 0
+
+MoveNoise 20
+
+Results
+unwashed_dishes @(unwashed_dishes)+$atend()*1

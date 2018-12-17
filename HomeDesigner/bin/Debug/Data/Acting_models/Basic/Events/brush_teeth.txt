@@ -1,0 +1,11 @@
+brush_teeth BottomEvent
+
+PlusInterrupt 0
+
+Duration 5*60
+DurationDeviation 1*60
+
+MoveNoise 20
+
+Results
+water_use @(water_use)+$atstart()*(+1)+$atend()*(-1)+@(step)*(0)

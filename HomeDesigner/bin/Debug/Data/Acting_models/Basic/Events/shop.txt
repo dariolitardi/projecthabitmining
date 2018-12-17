@@ -1,0 +1,9 @@
+shop MainEvent
+
+Priority (120-@(food))*@(c_sh)
+
+Interrupt 200
+
+Flow  Simple
+go_wardrobe change_clothes go_shoe_shelf dress_up_outdoor go_outside get_food go_shoe_shelf dress_down_outdoor go_wardrobe change_clothes go_kitchen_shelf pack_goods
+ ;200-@(food) ;for ;door ;close ;test

@@ -1,0 +1,9 @@
+someone_at_entrace MainEvent
+
+Priority (@(since_post)>@(next_post))*150
+
+Interrupt 100
+
+Flow  Simple
+go_entrace interact_with_man
+ ;+(@(time)/60/60>10+24)*200-@(done_post)*200

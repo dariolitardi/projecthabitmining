@@ -1,0 +1,28 @@
+Positions
+bathroom_sink 300 200
+bathtub 300 250
+bed 300 300
+chair 300 350
+computer 300 400
+computer_chair 300 450
+dining_chair 300 500
+dining_table 300 550
+entrace 300 600
+exercise_place 300 650
+fridge 300 700
+kitchen_shelf 600 200
+kitchen_sink 600 250
+micro 600 300
+outside 600 350
+oven 600 400
+shoe_shelf 600 450
+start 600 500
+tv 600 550
+tv_chair 600 600
+wardrobe 600 650
+wc 600 700
+
+Walls
+
+Sensors
+

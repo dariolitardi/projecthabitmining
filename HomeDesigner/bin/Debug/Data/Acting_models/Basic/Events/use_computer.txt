@@ -1,0 +1,8 @@
+use_computer MainEvent
+
+Priority @(pc_need)*10
+
+Interrupt 20
+
+Flow  Simple
+go_computer switch_computer_on go_computer_chair use_the_computer go_computer switch_computer_off

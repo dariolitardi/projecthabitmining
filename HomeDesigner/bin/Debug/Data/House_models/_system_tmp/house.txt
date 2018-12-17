@@ -1,0 +1,88 @@
+Positions
+p1 50 150
+p2 600 150
+p3 50 1350
+p4 600 1350
+p5 50 500
+p6 50 700
+p7 600 500
+p8 600 700
+p10 850 150
+p12 600 750
+p15 800 750
+p16 1000 750
+p17 850 1350
+p18 1050 1350
+p20 2000 1350
+p22 1800 750
+p24 1800 500
+p25 2000 150
+p13 1400 750
+p14 1400 1350
+p11 1400 500
+p19 1400 150
+bathroom_sink 1600 450
+bed 1650 1250
+computer_chair 1650 900
+computer 1650 850
+dining_chair 300 900
+dining_table 300 1000
+entrace 750 250
+fridge 700 1250
+kitchen_sink 1300 1050
+micro 1300 850
+outside 1100 50
+start 750 150
+tv 150 250
+tv_chair 150 400
+wardrobe 1900 1050
+wc 1500 250
+bathtub 1850 250
+oven 1200 850
+kitchen_shelf 1300 1150
+shoe_shelf 1200 250
+exercise_place 150 1250
+chair 850 950
+p9 200 550
+p21 450 550
+p23 200 750
+p26 500 750
+p27 200 850
+p28 450 850
+p29 450 850
+p30 200 1100
+p31 450 1100
+p32 450 1100
+p33 200 1100
+p34 750 900
+
+Walls
+p1 p2
+p6 p3
+p3 p4
+p8 p12
+p12 p15
+p12 p4
+p16 p13
+p4 p17
+p18 p14
+p13 p14
+p14 p20
+p13 p22
+p11 p24
+p11 p19
+p2 p7
+p10 p19
+p19 p25
+p1 p5
+p20 p25
+
+Sensors
+entry 1000 450 0 type1
+kitchen 1000 1050 0 type1
+bedroom 1700 1050 0 type1
+bath 1700 300 0 type1
+corridor 1700 600 0 type1
+dining_roomA 300 1050 0 type1
+dining_roomB 300 450 0 type1
+

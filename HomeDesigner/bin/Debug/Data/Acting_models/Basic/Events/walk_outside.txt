@@ -1,0 +1,11 @@
+walk_outside BottomEvent
+
+PlusInterrupt 200
+
+Duration 20*60+100*60*@(c_oul)
+DurationDeviation (20*60+100*60*@(c_oul))/3
+
+MoveNoise 20
+
+Results
+a 2

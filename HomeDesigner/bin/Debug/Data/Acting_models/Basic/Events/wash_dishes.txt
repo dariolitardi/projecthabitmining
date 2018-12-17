@@ -1,0 +1,13 @@
+wash_dishes BottomEvent
+
+PlusInterrupt 0
+
+Duration @(unwashed_dishes)*3
+DurationDeviation 0
+
+MoveNoise 30
+
+Results
+unwashed_dishes @(unwashed_dishes)-1/3*@(step)
+water_use @(water_use)+$atstart()*(+3)+$atend()*(-3)+@(step)*(0)
+a 3

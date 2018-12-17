@@ -1,0 +1,12 @@
+do_watch_tv BottomEvent
+
+PlusInterrupt 0
+
+Duration 60*60
+DurationDeviation 20*60
+
+MoveNoise 5
+
+Results
+bored @(bored)-50/60/60*@(step)
+a 2

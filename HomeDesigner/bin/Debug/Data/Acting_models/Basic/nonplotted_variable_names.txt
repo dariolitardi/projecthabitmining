@@ -1,0 +1,23 @@
+a
+warm_food_need
+walk_need
+exer_need
+pc_need
+tiredness 
+since_post
+next_post computer_addict
+done_post
+freq_post
+time
+step
+;fridge_door_contact
+eat
+drink
+sleeping
+bored
+wc_need
+wc_use
+TV_time
+speed
+;next_post
+power_plus_use

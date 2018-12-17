@@ -1,0 +1,10 @@
+get_clothes BottomEvent
+
+PlusInterrupt 0
+
+Duration 60
+DurationDeviation 20
+
+MoveNoise 20
+
+Results

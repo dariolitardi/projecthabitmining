@@ -1,0 +1,10 @@
+get_cold_warm_food BottomEvent
+
+PlusInterrupt 0
+
+Duration 2*60
+DurationDeviation 20
+
+MoveNoise 20
+
+Results

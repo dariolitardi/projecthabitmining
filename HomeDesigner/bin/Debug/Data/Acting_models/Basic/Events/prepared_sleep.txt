@@ -1,0 +1,8 @@
+prepared_sleep MainEvent
+
+Priority $min($attime(0,2)*100+@(tiredness)-100,100)+1
+
+Interrupt 200-$attime(0,2)*100
+
+Flow  Simple
+go_wardrobe get_clothes go_bathtub have_bath go_bathroom_sink brush_teeth go_bed sleep_in_bed go_wardrobe change_clothes

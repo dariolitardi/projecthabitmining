@@ -1,0 +1,11 @@
+get_food BottomEvent
+
+PlusInterrupt 0
+
+Duration 40*60
+DurationDeviation 10*60
+
+MoveNoise 20
+
+Results
+a 3

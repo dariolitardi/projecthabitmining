@@ -1,0 +1,11 @@
+rest_in_chair BottomEvent
+
+PlusInterrupt 0
+
+Duration 20*60
+DurationDeviation 5*60
+
+MoveNoise 5
+
+Results
+a 2

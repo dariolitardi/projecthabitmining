@@ -1,0 +1,29 @@
+StepEffects
+
+tiredness @(tiredness)+((1-@(sleeping))*5/60/60-@(sleeping)*80/8/60/60/(0.5+@(c_sl)))*@(step)
+
+time @(time)+1*@(step)
+
+bored $min($max(@(bored)+(1-@(sleeping))*100/16/60/60*@(step)*@(c_tv)*1.5,0),60)
+
+warm_food_need $min(@(warm_food_need)+10/24/60/60*@(step)*@(c_fw)*2,40)
+
+pressure_bed 0
+
+since_post @(since_post)+($attime(13,3)>0)*@(step)/60/60
+
+exer_need @(exer_need)+(1-@(sleeping))*@(step)/60/60*@(c_ex)*0.8
+walk_need @(walk_need)+(1-@(sleeping))*@(step)/60/60*@(c_ou)
+pc_need @(pc_need)+(1-@(sleeping))*@(step)/60/60*@(c_pc)*1.5
+
+next_post @(next_post)+(@(next_post)>999999)*(@(c_post)-1000000)
+freq_post (1/(@(c_mm)+0.05))*4
+
+eat 0
+drink 0 
+wc_use 0
+sleeping 0
+
+hunger !function=hungersimulator
+thirst !function=thirstsimulator
+wc_need !function=wcneedsimulator

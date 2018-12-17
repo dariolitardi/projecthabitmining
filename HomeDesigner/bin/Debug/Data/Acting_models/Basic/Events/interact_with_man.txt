@@ -1,0 +1,12 @@
+interact_with_man BottomEvent
+
+PlusInterrupt 0
+
+Duration 3*60
+DurationDeviation 60
+
+MoveNoise 20
+
+Results
+next_post @(next_post)*(1-$atend())+@(freq_post)*$rand()*$atend()
+since_post @(since_post)-@(since_post)*$atend()

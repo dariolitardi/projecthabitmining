@@ -1,0 +1,12 @@
+wash_hands BottomEvent
+
+PlusInterrupt 0
+
+Duration 0
+DurationDeviation 0
+
+MoveNoise 20
+
+Results
+water_use @(water_use)+$atstart()*(+4)+$atend()*(-4)+@(step)*(0)
+a 1

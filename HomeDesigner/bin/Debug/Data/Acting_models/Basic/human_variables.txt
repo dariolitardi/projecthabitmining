@@ -1,0 +1,22 @@
+;name,initvalue
+
+hunger 0
+thirst 20
+tiredness 50
+eat 0
+drink 0
+sleeping 0
+wc_need 0
+wc_use 0
+done_post 0
+since_post 0
+next_post 1000000
+time 0
+bored 2
+warm_food_need -1
+
+walk_need 4
+exer_need 2
+pc_need 2
+
+a 0

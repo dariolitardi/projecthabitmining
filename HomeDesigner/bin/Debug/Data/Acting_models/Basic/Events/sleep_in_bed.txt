@@ -1,0 +1,13 @@
+sleep_in_bed BottomEvent
+
+PlusInterrupt 0
+
+Duration @(tiredness)/80*7*60*60*(0.5+@(c_sl))
+DurationDeviation 60*60
+
+MoveNoise 2
+
+Results
+sleeping 1
+pressure_bed @(pressure_bed)+1
+a 0

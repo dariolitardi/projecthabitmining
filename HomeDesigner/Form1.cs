@@ -16,6 +16,8 @@ using System.Text;
 
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
+using System.Threading;
 using Devart.Data.SQLite;
 using Devart.Data;
 
@@ -35,7 +37,6 @@ namespace HomeDesigner
     private Button disegna;
     private Button simula;
     private Button disegnaPredizione;
-
     private Button doEdits;
     private CheckBox adjustCheckBox;
     private CheckBox sensorCheckBox;
@@ -60,9 +61,12 @@ namespace HomeDesigner
     private Label label8;
     private Button button1;
     private Label label9;
+    private Label simulationLabel;
+    private Label designLabel;
+
     private Label label10;
     private ComboBox posNamecb;
-    private ComboBox simulationBox;
+    private TextBox simulationBox;
     private ComboBox numeroPersoneBox;
     private ComboBox intervalloBox;
 
@@ -116,9 +120,12 @@ namespace HomeDesigner
       this.label8 = new Label();
       this.button1 = new Button();
       this.label9 = new Label();
+      this.simulationLabel = new Label();
+      this.designLabel = new Label();
+
       this.label10 = new Label();
       this.posNamecb = new ComboBox();
-      this.simulationBox = new ComboBox();
+      this.simulationBox = new TextBox();
       this.numeroPersoneBox = new ComboBox();
       this.intervalloBox = new ComboBox();
 
@@ -178,7 +185,7 @@ namespace HomeDesigner
       this.save.Text = "Save";
       this.save.UseVisualStyleBackColor = true;
       this.save.Click += new EventHandler(this.button1_Click);
-      this.disegna.Location = new Point(600, 7);
+      this.disegna.Location = new Point(600, 20);
       this.disegna.Name = "disegna";
       this.disegna.Size = new Size(70, 31);
       this.disegna.TabIndex = 5;
@@ -188,13 +195,14 @@ namespace HomeDesigner
      
       this.disegnaPredizione.Location = new Point(670, 7);
       this.disegnaPredizione.Name = "disegnaPredizione";
-      this.disegnaPredizione.Size = new Size(120, 31);
+      this.disegnaPredizione.Size = new Size(33, 31);
       this.disegnaPredizione.TabIndex = 5;
-      this.disegnaPredizione.Text = "Draw Predicted Path";
+      this.disegnaPredizione.Image = System.Drawing.Image.FromFile("Resources/play_image.PNG");
+      disegnaPredizione.AutoSize = true;
       this.disegnaPredizione.UseVisualStyleBackColor = true;
       this.disegnaPredizione.Click += new EventHandler(this.buttonDisegnaPredizione_Click);
       
-      this.simula.Location = new Point(600, 40);
+      this.simula.Location = new Point(450, 45);
       this.simula.Name = "simula";
       this.simula.Size = new Size(70, 31);
       this.simula.TabIndex = 5;
@@ -391,6 +399,20 @@ namespace HomeDesigner
       this.label9.Size = new Size(139, 13);
       this.label9.TabIndex = 28;
       this.label9.Text = "Choose home name for load";
+      this.simulationLabel.AutoSize = true;
+      this.simulationLabel.Location = new Point(450, 1);
+      this.simulationLabel.Name = "simulationLabel";
+      this.simulationLabel.Size = new Size(139, 13);
+      this.simulationLabel.TabIndex = 28;
+      this.simulationLabel.Text = "Simulation";
+      this.simulationLabel.Font = new Font("Microsoft JhengHei", 10,FontStyle.Regular);
+      this.designLabel.AutoSize = true;
+      this.designLabel.Location = new Point(600, 1);
+      this.designLabel.Name = "simulationLabel";
+      this.designLabel.Size = new Size(139, 13);
+      this.designLabel.TabIndex = 28;
+      this.designLabel.Text = "Designer";
+      this.designLabel.Font = new Font("Microsoft JhengHei", 10,FontStyle.Regular);
       this.label10.AutoSize = true;
       this.label10.Location = new Point(222, 23);
       this.label10.Name = "label10";
@@ -406,22 +428,20 @@ namespace HomeDesigner
       this.posNamecb.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
       
       this.simulationBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      this.simulationBox.FormattingEnabled = true;
       this.simulationBox.Location = new Point(425, 9);
       this.simulationBox.Name = "simulationBox";
       this.simulationBox.Size = new Size(121, 21);
       this.simulationBox.TabIndex = 30;
-      this.simulationBox.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
       this.numeroPersoneBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
       this.numeroPersoneBox.FormattingEnabled = true;
-      this.numeroPersoneBox.Location = new Point(50, 9);
+      this.numeroPersoneBox.Location = new Point(50, 20);
       this.numeroPersoneBox.Name = "numeroPersoneBox";
       this.numeroPersoneBox.Size = new Size(121, 21);
       this.numeroPersoneBox.TabIndex = 30;
       this.numeroPersoneBox.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
       this.intervalloBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
       this.intervalloBox.FormattingEnabled = true;
-      this.intervalloBox.Location = new Point(50, 50);
+      this.intervalloBox.Location = new Point(300, 50);
       this.intervalloBox.Name = "intervalloBox";
       this.intervalloBox.Size = new Size(121, 21);
       this.intervalloBox.TabIndex = 30;
@@ -437,6 +457,9 @@ namespace HomeDesigner
 
       this.Controls.Add((Control) this.label10);
       this.Controls.Add((Control) this.label9);
+      this.Controls.Add((Control) this.simulationLabel);
+      this.Controls.Add((Control) this.designLabel);
+
       this.Controls.Add((Control) this.button1);
       this.Controls.Add((Control) this.label8);
       this.Controls.Add((Control) this.savecb);
@@ -509,25 +532,25 @@ namespace HomeDesigner
       
       this.intervalloBox.Items.Add((object) "[interval_of_time]");
 
-      this.intervalloBox.Items.Add((object) "00:00:00-04:00:00");
-      this.intervalloBox.Items.Add((object) "04:00:01-08:00:00");
-      this.intervalloBox.Items.Add((object) "08:00:00-12:00:00");
-      this.intervalloBox.Items.Add((object) "12:00:01-16:00:00");
-      this.intervalloBox.Items.Add((object) "16:00:01-20:00:00");
-      this.intervalloBox.Items.Add((object) "20:00:01-23:50:00");
+      this.intervalloBox.Items.Add((object) "00:00:00-02:00:00");
+      this.intervalloBox.Items.Add((object) "02:00:01-04:00:00");
+      this.intervalloBox.Items.Add((object) "04:00:01-06:00:00");
+      this.intervalloBox.Items.Add((object) "06:00:01-08:00:00");
+      this.intervalloBox.Items.Add((object) "08:00:01-10:00:00");
+      this.intervalloBox.Items.Add((object) "10:00:01-12:00:00");
+      this.intervalloBox.Items.Add((object) "12:00:01-14:00:00");
+      this.intervalloBox.Items.Add((object) "14:00:01-16:00:00");
+      this.intervalloBox.Items.Add((object) "16:00:01-18:00:00");
+      this.intervalloBox.Items.Add((object) "18:00:01-20:00:00");
+      this.intervalloBox.Items.Add((object) "20:00:01-22:00:00");
+      this.intervalloBox.Items.Add((object) "22:00:01-23:50:00");
+
 
   
       this.intervalloBox.SelectedItem = (object)"[interval_of_time]";
 
      
-      this.simulationBox.Items.Add((object) "[simulation_name]");
-      foreach (object obj in subdirectoryEntries)
-      {
-        string s = obj.ToString().Split(Path.DirectorySeparatorChar)[8];
-      this.simulationBox.Items.Add(s);
-      }
-
-      this.simulationBox.SelectedItem = (object) "[simulation_name]";
+   
     }
 
     private void Form1_Load(object sender, EventArgs e)
@@ -686,18 +709,39 @@ namespace HomeDesigner
     }
     public void refreshSimulazione()
     {
+      string folderPath = "";
+      FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+      folderBrowserDialog1.SelectedPath = "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log";
+      if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+        folderPath = folderBrowserDialog1.SelectedPath ;
+        simulationBox.Text = folderPath.Substring(50);
+      }
       this.posTextBox.Text = Printer.printPos(this.data.pos);
       this.wallTextBox.Text = Printer.printWall(this.data.wall);
       this.sensortb.Text = Printer.printSensor(this.data.sensor);
-      this.pictureBox1.Image = (Image) this.data.drawSimulate(this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked);
+      this.pictureBox1.Image = (Image) this.data.drawSimulate(folderPath,this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked);
     }
    
     public void refreshPrediction( Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary)
     {
+    /*  string folderPath = "";
+      FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+      folderBrowserDialog1.SelectedPath = "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log";
+      if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+        folderPath = folderBrowserDialog1.SelectedPath ;
+        simulationBox.Text = folderPath.Substring(50);
+      }
+     
+*/
+
       this.posTextBox.Text = Printer.printPos(this.data.pos);
       this.wallTextBox.Text = Printer.printWall(this.data.wall);
       this.sensortb.Text = Printer.printSensor(this.data.sensor);
-      this.pictureBox1.Image = (Image) this.data.drawPrediction(dictionary,this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked);
+      ThreadStart threadDelegate = delegate { this.pictureBox1.Image = (Image) this.data.drawPrediction( this.pictureBox1,dictionary,this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked); };
+      Thread newThread = new Thread(threadDelegate);
+      newThread.Start();
+  
+
     }
 
     public void refresh()
@@ -831,6 +875,7 @@ namespace HomeDesigner
 
 
       Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary= getPosizioni(idseg);
+     
 
 
       this.refreshPrediction(dictionary);
@@ -921,6 +966,11 @@ namespace HomeDesigner
         this.data.setPath();
         int numeroPersone = Convert.ToInt32(numeroPersoneBox.Text);
         this.data.simulationHandler(numeroPersone);
+
+      }
+      else
+      {
+        MessageBox.Show("Choose the number of people for the simulation!");
 
       }
 

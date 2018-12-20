@@ -21,6 +21,6 @@ C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\VsWebSite.Interop.dll
 C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\stdole.dll
 C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\Devart.Data.xml
 C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\Devart.Data.SQLite.xml
-C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\EnvDTE.xml
-C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\VSLangProj.xml
-C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\VsWebSite.Interop.xml
+C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\Microsoft.VisualStudio.Shell.Interop.dll
+C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\Microsoft.VisualStudio.OLE.Interop.dll
+C:\Users\Dario\Desktop\HomeDesigner\bin\Debug\Microsoft.VisualStudio.TextManager.Interop.dll

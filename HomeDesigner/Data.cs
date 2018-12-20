@@ -22,6 +22,9 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Timer = System.Threading.Timer;
 
 namespace HomeDesigner
 {
@@ -297,104 +300,11 @@ namespace HomeDesigner
 
 
 
-           
           
-            ThreadStart threadDelegate3 = delegate { this.generateDataset(numeroPersone);            }; 
-            Thread newThread3 = new Thread(threadDelegate3);
-            newThread3.Start();
-            newThread3.Join();
 
         }
 
-        public void generateDataset(int nFile)
-        {
-         
-            try
-            {
-                locker.AcquireWriterLock(int.MaxValue); 
-         
-            TextWriter logDataset = (TextWriter) new StreamWriter(pathdir+"\\PathsDataset.txt");
-            var now = DateTime.Now;
-            DateTime time = new DateTime(now.Year, now.Month, now.Day,0,0,0);
-
-            logDataset.WriteLine("timestamp u1 u2 crossing");
-
-            for (int i = 0; i < 86300; i++)
-            {
-                
-                datasetFile.Add(new KeyValuePair<String,List<KeyValuePair<int,Position>>>( time.ToString("HH:mm:ss"),new List<KeyValuePair<int,Position>>()));
-                time = time.AddSeconds(1);
-            }
-            for (int i = 1; i <= nFile; i++)
-            {
-                readPathLog(i);
-                
-            }
-
-         
-//qui faccio il controllo degli incroci
-         
-          
-                
-                for (int j=0; j<datasetFile.Count; j++)
-                {
-                    StringBuilder stringBuilder= new StringBuilder();
-
-                    if (j != 0 && j+1<datasetFile.Count)
-                    {
-                       
-                        List<KeyValuePair<int,Position>> list= posizioniUguali(datasetFile[j].Value);
-                        if (list != null)
-                        {
-                            List<KeyValuePair<int,Position>> list1=new List<KeyValuePair<int, Position>>() ;
-                            List<KeyValuePair<int,Position>> list2=  new List<KeyValuePair<int, Position>>();
-
-                           
-                            
-                          
-                                list1.Add(datasetFile[j - 1].Value[0]);
-                            list1.Add(datasetFile[j - 1].Value[1]);
-                            list2.Add(datasetFile[j + 1].Value[0]);
-                            list2.Add(datasetFile[j + 1].Value[1]);
-
-                            
-                            stringBuilder.Append("{");
-                                //prodotto cartesiano per gli incroci
-                            for(int m=0; m<list1.Count; m++)
-                            {
-                                for(int n=0; n<list2.Count; n++)
-                                {
-                                    if(m==list1.Count-1 && n==list2.Count-1)
-                                        stringBuilder.Append("(("+list1[m].Value.x+"," 
-                                                             +list1[m].Value.y+"),("+
-                                                             list2[n].Value.x+","+
-                                                             list2[n].Value.y+"))");
-                                    else
-                                    stringBuilder.Append("(("+list1[m].Value.x+"," 
-                                                         +list1[m].Value.y+"),("+
-                                                         list2[n].Value.x+","+
-                                    list2[n].Value.y+")),");
-                                   
-                                } 
-                            }
-                            stringBuilder.Append("}");
-
-
-                        }
-                     
-                    }
-
-                    String s = converti(datasetFile[j].Value);
-                    logDataset.WriteLine(datasetFile[j].Key+ " "+ s+stringBuilder.ToString());
-                }
-            }
-            finally
-            {
-                locker.ReleaseWriterLock();
-            }
-               
-            
-        }
+   
 
         private String converti(List<KeyValuePair<int,Position> >lista)
         {
@@ -522,7 +432,7 @@ namespace HomeDesigner
         
     }
         
-    public Bitmap drawPrediction(Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary,bool drawPlaces, bool drawSensors, bool drawWalls)
+    public Bitmap drawPrediction(PictureBox pictureBox1,Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary,bool drawPlaces, bool drawSensors, bool drawWalls)
         {
         
 
@@ -564,13 +474,9 @@ namespace HomeDesigner
                 }
             }
 
-       
-            Pen pen10 = new Pen(Brushes.Brown, 3f);
-            Position p1, p2 = null;
-            // Create rectangle to bound ellipse.
-            Rectangle rect;
-            List< List<KeyValuePair<Position,Color> >> listona=new List< List<KeyValuePair<Position,Color> >>();
-            int j = 0;
+
+            
+     
             var now = DateTime.Now;
             DateTime time = new DateTime(now.Year, now.Month, now.Day,0,0,0);
             List<KeyValuePair<Position,Color>> list;
@@ -584,7 +490,25 @@ namespace HomeDesigner
                 list2 = dictionary[time.ToString("HH:mm:ss")];
                 foreach (KeyValuePair<Position, Color> keyValuePair in list)
                 {
-                    DrawerHandler(keyValuePair, list2,graphics);
+                    ThreadStart threadDelegate = delegate {DrawerHandler(keyValuePair, list2, graphics);; };
+                    Thread newThread = new Thread(threadDelegate);
+                    newThread.Start();
+                    
+
+                    pictureBox1.Invoke((MethodInvoker)delegate
+                    {
+
+                        pictureBox1.Image = (Image) bitmap;
+
+                        pictureBox1.Refresh(); //questo refresh serve per restiture al gui thread un risultato parziale e temporaneo dell'imagine
+                    }); 
+                  
+                    newThread.Join();
+
+                    // ogni linea viene graficata ogni mezzo secondo
+
+
+
                 }
 
                 list = list2;
@@ -597,8 +521,8 @@ namespace HomeDesigner
             return bitmap;
 
         }
-        
-        private void DrawerHandler(KeyValuePair<Position,Color> entry, List<KeyValuePair<Position, Color>> lista,Graphics graphics)
+
+         public void DrawerHandler(KeyValuePair<Position,Color> entry, List<KeyValuePair<Position, Color>> lista,Graphics graphics)
         {
             foreach (KeyValuePair<Position, Color> keyValuePair in lista)
             {
@@ -610,14 +534,17 @@ namespace HomeDesigner
                     Position p2 = keyValuePair.Key;
                    
                     graphics.DrawLine(pen, (float) p1.x, (float) p1.y, (float) p2.x, (float) p2.y);
+                    System.Threading.Thread.Sleep(500);
+
                     return;
                 }
             }
+          
         }
  
          
 
-    public Bitmap drawSimulate(bool drawPlaces, bool drawSensors, bool drawWalls)
+    public Bitmap drawSimulate(String folderPath,bool drawPlaces, bool drawSensors, bool drawWalls)
         {
         
 
@@ -658,8 +585,16 @@ namespace HomeDesigner
                         (float) (sensor.y / 2.0 - Math.Cos(sensor.orinentation / 180.0 * 3.14) * 10.0));
                 }
             }
-
-       
+            string[] fileArray = Directory.GetFiles(folderPath, "*.txt");
+            List<List<Position>> listonaTraiettorie=new List<List<Position>>();
+            foreach (String filename in fileArray)
+            {
+                if (filename.Contains("PathLog"))
+                {
+                    List<Position >posizioni = readPositions(folderPath+"\\"+filename);
+                    listonaTraiettorie.Add(posizioni);
+                }
+            }
 
             List<Position >map = readPositions(pathdir+"\\PathLog1.txt");
             if (map == null)

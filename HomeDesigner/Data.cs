@@ -124,14 +124,13 @@ namespace HomeDesigner
             return true;
         }
 
-        private List<Position> readPositions(String path)
+        private void readPositions(String path,    Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary ,Color color)
         {
             try
             {
-                List<Position> map = new List<Position>();
                 String lineLog;
                 FileStream fs = new FileStream(path, FileMode.Open);
-
+                
 //Pass the file path and file name to the StreamReader constructor
                 StreamReader sr1 = new StreamReader(fs);
 
@@ -143,9 +142,10 @@ namespace HomeDesigner
                 {
                     if (i < 300)
                     {
-
+                        
                         String[] parsedLine = lineLog.Split(' ');
                         Position position = new Position();
+                        String ts = parsedLine[0];
                         float x0 = float.Parse(parsedLine[1], CultureInfo.InvariantCulture);
                         float y0 = float.Parse(parsedLine[2], CultureInfo.InvariantCulture);
 
@@ -153,7 +153,19 @@ namespace HomeDesigner
                         position.x = (double) x0;
                         position.y = (double) y0;
 
-                        map.Add(position);
+                        if (dictionary.ContainsKey(ts))
+                        {
+                            KeyValuePair<Position, Color> keyValuePair= new KeyValuePair<Position, Color>(position,color);
+                            dictionary[ts].Add(keyValuePair);
+                        }
+                        else
+                        {
+                            List<KeyValuePair<Position,Color>> lista= new List<KeyValuePair<Position, Color>>();
+                            KeyValuePair<Position, Color> keyValuePair= new KeyValuePair<Position, Color>(position,color);
+                            lista.Add(keyValuePair);
+                            dictionary.Add(ts,lista);
+                        }
+                       
 
 
                         lineLog = sr1.ReadLine();
@@ -165,13 +177,13 @@ namespace HomeDesigner
                 fs.Close();
 
                 sr1.Close();
-                return map;
+                return ;
 
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.Message);
-                return null;
+                return ;
             }
             finally
             {
@@ -544,7 +556,7 @@ namespace HomeDesigner
  
          
 
-    public Bitmap drawSimulate(String folderPath,bool drawPlaces, bool drawSensors, bool drawWalls)
+    public Bitmap drawSimulate(String folderPath,PictureBox pictureBox1,bool drawPlaces, bool drawSensors, bool drawWalls)
         {
         
 
@@ -586,80 +598,65 @@ namespace HomeDesigner
                 }
             }
             string[] fileArray = Directory.GetFiles(folderPath, "*.txt");
-            List<List<Position>> listonaTraiettorie=new List<List<Position>>();
+            Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary = new Dictionary<string, List<KeyValuePair<Position,Color>>>();
+            Random rand = new Random();
             foreach (String filename in fileArray)
             {
                 if (filename.Contains("PathLog"))
                 {
-                    List<Position >posizioni = readPositions(folderPath+"\\"+filename);
-                    listonaTraiettorie.Add(posizioni);
+                    Color color= Color.FromArgb(rand.Next(256),rand.Next(256),rand.Next(256));
+
+                     readPositions(filename,dictionary,color);
                 }
             }
+             TextWriter textWriter = (TextWriter) new StreamWriter("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\prova.txt");
 
-            List<Position >map = readPositions(pathdir+"\\PathLog1.txt");
-            if (map == null)
-                return bitmap;
-            Pen pen10 = new Pen(Brushes.Brown, 3f);
-            Position p1, p2 = null;
-            // Create rectangle to bound ellipse.
-            Rectangle rect;
-             
-            // Create start and sweep angles on ellipse.
-            float startAngle = 90f;
-            float sweepAngle = 270f;
-            List<float> d1=new List<float>();
-            d1.Add(startAngle);
-            d1.Add(sweepAngle);
-
-            float startAngle1 = 270f;
-            float sweepAngle1 = 90f;
-            List<float> d2=new List<float>();
-            d2.Add(startAngle);
-            d2.Add(sweepAngle);
-            List<float> d3=new List<float>();
-            d3.Add(0);
-            d3.Add(180);
-            List<float> d4=new List<float>();
-            d4.Add(180);
-            d4.Add(360);
-            // Draw arc to screen.
-            
-            for (int i = 0; i <map.Count; i++)
+            foreach (var VARIABLE in dictionary)
             {
-                p1 = map[i];
-                if (i + 1 < map.Count)
-                {
-                    p2 = map[i + 1];
-                   
-                    graphics.DrawLine(pen10,(float) p1.x,(float)p1.y,(float) p2.x,(float)p2.y );
-                
-
-                }else
-                    break;
+                textWriter.WriteLine(VARIABLE.Key+" "+ VARIABLE.Value[0]+" "+VARIABLE.Value[1]);
 
             }
+            textWriter.Close();
             
-            List<Position >map2 = readPositions(pathdir+"\\PathLog2.txt");
-            if (map2 == null)
-                return bitmap;
-            Pen pen = new Pen(Brushes.Gold, 3f);
-            Position p11, p21 = null;
-            // Create rectangle to bound ellipse.
-            
-            for (int i = 0; i < map2.Count; i++)
-            {
-                p11 = map2[i];
-                if (i + 1 <map2.Count)
+            var now = DateTime.Now;
+            DateTime time = new DateTime(now.Year, now.Month, now.Day,0,0,0);
+            List<KeyValuePair<Position,Color>> list;
+            List<KeyValuePair<Position,Color>> list2;
+
+            list = dictionary[time.ToString("HH:mm:ss")];
+            for(int h=1; h<dictionary.Count; h++)
+            {                
+                time = time.AddSeconds(1);
+
+                list2 = dictionary[time.ToString("HH:mm:ss")];
+                foreach (KeyValuePair<Position, Color> keyValuePair in list)
                 {
-                    p21 = map2[i + 1];
-                    graphics.DrawLine(pen,(float) p11.x,(float)p11.y,(float) p21.x,(float)p21.y );
+                    ThreadStart threadDelegate = delegate {DrawerHandler(keyValuePair, list2, graphics);; };
+                    Thread newThread = new Thread(threadDelegate);
+                    newThread.Start();
+                    
+
+                    pictureBox1.Invoke((MethodInvoker)delegate
+                    {
+
+                        pictureBox1.Image = (Image) bitmap;
+
+                        pictureBox1.Refresh(); //questo refresh serve per restiture al gui thread un risultato parziale e temporaneo dell'imagine
+                    }); 
+                  
+                    newThread.Join();
+
+                    // ogni linea viene graficata ogni mezzo secondo
 
 
-                }else
-                    break;
+
+                }
+
+                list = list2;
+
 
             }
-         
+
             
            
             return bitmap;

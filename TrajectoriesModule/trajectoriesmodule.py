@@ -9,19 +9,26 @@ from datetime import datetime
 from datetime import timedelta
 import traj_reconstructor
 import trajectories_drawer
+from tkinter import messagebox
+from tkinter import filedialog
+from tkinter import *
 
 class Position:
      x = 0
      y = 0
+
+
+
+
 def CalcolaMinimoTimestamp(listatimestamp):
-    parsedstring=listatimestamp[0].split(',')
+    parsedstring=listatimestamp[0].split('-')
     idfilemin=parsedstring[1]
     tm=parsedstring[0]
     posizionemin=parsedstring[2]
     timestampmin = datetime.strptime(tm,("%H:%M:%S"))
     c=0
     for i in range(1, len(listatimestamp)):
-        parsedstring2 = listatimestamp[i].split(',')
+        parsedstring2 = listatimestamp[i].split('-')
         idfilemin2 = parsedstring2[1]
         tm2 = parsedstring2[0]
         posizionemin2 = parsedstring2[2]
@@ -34,18 +41,19 @@ def CalcolaMinimoTimestamp(listatimestamp):
             posizionemin=posizionemin2
 
 
-    s= timestampmin.strftime("%H:%M:%S")+","+str(c)+","+str(idfilemin)+","+ posizionemin
+    s= timestampmin.strftime("%H:%M:%S")+"-"+str(c)+"-"+str(idfilemin)+"-"+ posizionemin
     return s
 
 def LeggiLinea(listafile):
     listaPuntatori=list()
     for i in range(0, len(listafile)):
         stringa= listafile[i].readline()
+
         if (stringa == ""):
             continue
         parsedline=stringa.split(' ')
 
-        linea =parsedline[0] + ","+str(i)+","+parsedline[1]+ " "+parsedline[2]
+        linea =parsedline[0] + "-"+str(i)+"-"+parsedline[1]+ " "+parsedline[2]
 
 
         listaPuntatori.append(linea)
@@ -58,16 +66,19 @@ def goto(linenum):
 
 
 def main():
-    exists = os.path.isfile(("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt"))
+    root = Tk()
+    root.directory = filedialog.askdirectory(initialdir="C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log", title="Select file")
+    exists = os.path.isfile((root.directory+"\\DatasetPaths.txt"))
     if exists:
-        os.remove("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt")
 
-    exists = os.path.isfile(
-        ("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\trajectoriesDB.db"))
-    if exists:
-        os.remove("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\trajectoriesDB.db")
+        os.remove(root.directory+"\\DatasetPaths.txt")
 
-    path= "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\*.txt"
+    exists2 = os.path.isfile(
+        (root.directory+"\\trajectoriesDB.db"))
+    if exists2:
+        os.remove(root.directory+"\\trajectoriesDB.db")
+
+    path= root.directory+"\\*.txt"
 
 
     #lettura dei pathlog della simulazione
@@ -86,7 +97,7 @@ def main():
 
     j=0
     ##scrive i dati su file
-    pathDataSetFile = "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim_354,471915566582\\DatasetPaths.txt"
+    pathDataSetFile = root.directory+"\\DatasetPaths.txt"
 
     datasetfile = open(pathDataSetFile, "a+")
     listapuntatorilinee=None
@@ -94,16 +105,16 @@ def main():
         if(j==0):
             listapuntatorilinee=LeggiLinea(listafile)
             j+=1
-
         if( not listapuntatorilinee):
-            traj_reconstructor.RecontructPathLogs()
-            ##trajectories_drawer.TestApp().run()
+            datasetfile.close()
 
+            traj_reconstructor.RecontructPathLogs(root.directory)
+            #trajectories_drawer.TestApp().run()
             return
 
 
         tsminimo=CalcolaMinimoTimestamp(listapuntatorilinee)
-        parsedstring=tsminimo.split(',')
+        parsedstring=tsminimo.split('-')
         timestampmin=parsedstring[0]
         filetsminimo=int(parsedstring[1])
         idfiletsminimo=int(parsedstring[2])
@@ -126,7 +137,7 @@ def main():
 
         if (line != ""):
 
-                listapuntatorilinee.append(line+","+str(idfiletsminimo)+","+parsedline[1]+" "+parsedline[2])
+                listapuntatorilinee.append(line+"-"+str(idfiletsminimo)+"-"+parsedline[1]+" "+parsedline[2])
 
         del(listapuntatorilinee[filetsminimo])
 

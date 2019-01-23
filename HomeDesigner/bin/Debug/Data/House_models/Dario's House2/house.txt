@@ -43,6 +43,16 @@ kitchen_shelf 1300 1150
 shoe_shelf 1200 250
 exercise_place 150 1250
 chair 850 950
+tv_kitchen 650 950
+library 1550 700
+dishwasher 1300 950
+washing_machine 1700 200
+cookers 1050 850
+closet 1950 650
+sofa 400 400
+shower_stall 1450 400
+coat_hangers 650 400
+table 850 1050
 
 Walls
 p1 p2
@@ -66,11 +76,4 @@ p1 p5
 p20 p25
 
 Sensors
-entry 1000 450 0 type1
-kitchen 1000 1050 0 type1
-bedroom 1700 1050 0 type1
-bath 1700 300 0 type1
-corridor 1700 600 0 type1
-dining_roomA 300 1050 0 type1
-dining_roomB 300 450 0 type1
 

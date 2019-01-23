@@ -20,3 +20,13 @@ tv
 tv_chair
 wardrobe
 wc
+tv_kitchen
+library
+dishwasher
+washing_machine
+cookers
+closet
+sofa
+shower_stall
+coat_hangers
+table

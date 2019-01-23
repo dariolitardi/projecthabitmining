@@ -43,18 +43,16 @@ kitchen_shelf 1300 1150
 shoe_shelf 1200 250
 exercise_place 150 1250
 chair 850 950
-p9 200 550
-p21 450 550
-p23 200 750
-p26 500 750
-p27 200 850
-p28 450 850
-p29 450 850
-p30 200 1100
-p31 450 1100
-p32 450 1100
-p33 200 1100
-p34 750 900
+tv_kitchen 650 950
+library 1550 700
+dishwasher 1300 950
+washing_machine 1700 200
+cookers 1050 850
+closet 1950 650
+sofa 400 400
+shower_stall 1450 400
+coat_hangers 650 400
+table 850 1050
 
 Walls
 p1 p2
@@ -78,11 +76,28 @@ p1 p5
 p20 p25
 
 Sensors
-entry 1000 450 0 type1
-kitchen 1000 1050 0 type1
-bedroom 1700 1050 0 type1
-bath 1700 300 0 type1
-corridor 1700 600 0 type1
-dining_roomA 300 1050 0 type1
-dining_roomB 300 450 0 type1
+e1 800 350 0 type1
+e2 1200 350 0 type1
+e3 1200 550 0 type1
+e4 800 550 0 type1
+dr1 250 350 0 type1
+dr2 450 350 0 type1
+dr3 250 550 0 type1
+dr4 450 550 0 type1
+dr5 250 750 0 type1
+dr6 450 750 0 type1
+dr7 250 950 0 type1
+dr8 450 950 0 type1
+dr9 250 1150 0 type1
+dr10 450 1150 0 type1
+k1 800 950 0 type1
+k2 1000 950 0 type1
+k3 1200 950 0 type1
+k4 800 1150 0 type1
+k5 1000 1150 0 type1
+k6 1200 1150 0 type1
+c1 1500 600 0 type1
+c2 1700 600 0 type1
+c3 1900 600 0 type1
+
 

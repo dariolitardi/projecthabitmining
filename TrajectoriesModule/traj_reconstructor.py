@@ -25,25 +25,28 @@ def GetDistanza(position1, position2):
 def Confronto(listaVettoriVelocitaMedie, velocitaMedia):
     return
 def CalcolaVelocitaVettorialeMedia(position1, position2, t1, t2):
-    r1=[] ##questi sono i raggi vettori r1 e r2
-    r2=[]
-    pOrigine = Position()
-    pOrigine.x=0
-    pOrigine.y=0
-    alpha1=math.cos(CalcolaAngolo(pOrigine,position1))*180/math.pi ##converte anche da radianti a gradi
-    rx1= GetDistanza(position1, pOrigine)*alpha1
-    ry1= GetDistanza(position1, pOrigine)*alpha1
-    r1.append(rx1)
-    r1.append(ry1)
+    ##r1=[] ##questi sono i raggi vettori r1 e r2
+    ##r2=[]
+    ##pOrigine = Position()
+    ##pOrigine.x=0
+    ##pOrigine.y=0
+    ##alpha1=(math.cos(CalcolaAngolo(pOrigine,position1))*180)/math.pi ##converte anche da radianti a gradi
+    ## rx1= GetDistanza(position1, pOrigine)*alpha1
+    ##ry1= GetDistanza(position1, pOrigine)*alpha1
+    ##r1.append(rx1)
+    ## r1.append(ry1)
 
-    alpha2 = math.cos(CalcolaAngolo(pOrigine, position2)) * 180 / math.pi
-    rx2 = GetDistanza(position2, pOrigine) * alpha2
-    ry2 = GetDistanza(position2, pOrigine) * alpha2
-    r2.append(rx2)
-    r2.append(ry2)
+    ##alpha2 = (math.cos(CalcolaAngolo(pOrigine, position2)) * 180) / math.pi
+    ##rx2 = GetDistanza(position2, pOrigine) * alpha2
+    ##ry2 = GetDistanza(position2, pOrigine) * alpha2
+    ##r2.append(rx2)
+    ##r2.append(ry2)
     velocita=[]
-    velocita.append((rx2-rx1)/(t2-t1))
-    velocita.append((ry2-ry1)/(t2-t1))
+    intervallo_tempo=t2-t1
+    print(intervallo_tempo.total_seconds())
+
+    velocita.append((position2.x-position1.x)/(intervallo_tempo.total_seconds()))
+    velocita.append((position2.y-position1.y)/(intervallo_tempo.total_seconds()))
 
     return velocita
 
@@ -123,7 +126,7 @@ def RecontructPathLogs(pathDirectoryLog):
             distanza=GetDistanza(p,pos)
             timestampPos=parsedline[0]
             if(distanza==0 and timestamp==timestampPos): ##qua trova l'incrocio
-                parsed=listasegmenti[index][len(listasegmenti[index])-1].split(' ')
+                parsed=listasegmenti[i][len(listasegmenti[i])-2].split(' ')
                 lastPosition0=Position()
                 lastPosition0.x = float(parsed[1].replace(',', '.'))
                 lastPosition0.y = float(parsed[2].replace(',', '.'))
@@ -132,10 +135,12 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
                 tm=datetime.strptime(timestampPos,("%H:%M:%S"))
+                print(tm.strftime("%H:%M:%S")+" "+t0.strftime("%H:%M:%S"))
                 v1=CalcolaVelocitaVettorialeMedia(lastPosition0, pos,t0,tm)
                 p2=Position()
                 p2.x=pos.x+v1[0]
                 p2.y=pos.y+v1[1]
+                print(str(p2.x)+" "+str(p2.y))
                 lineaNuova= f.readline()
                 lineaNuovaParsata=lineaNuova.split(' ')
                 posNuova = Position()

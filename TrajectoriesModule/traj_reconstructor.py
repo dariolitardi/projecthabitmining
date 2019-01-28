@@ -15,12 +15,84 @@ import time
 class Position:
     x = 0
     y = 0
+
+
+class FeatureVector:
+    position = Position()
+    id_segment = 0
+    distance=0
+    angle=0
+    isCentroid=False
+
+def EliminaVectorDaiCluster(lista_clusters,fv):
+    for cluster in lista_clusters:
+        for v in cluster:
+            if(v.isCentroid==False and fv.position.x==v.position.x and fv.position.y==v.position.y):
+
+                cluster.remove(v)
+def setFeatureVectorsInCluster(posincrocio,centroide, listaPunti, cluster):
+    for feature_vector in listaPunti:
+        d = GetDistanza(centroide.position, feature_vector.position)
+        if(d>=70):
+            continue
+        angolo=int(GetAngolo(posincrocio,centroide.position,feature_vector.position))
+        if(angolo<=45):
+
+            feature_vector.angle=angolo
+
+            feature_vector.distance=GetDistanza(centroide.position,feature_vector.position)
+
+
+            cluster.append(feature_vector)
+
+
+
+def GetCentroid(cluster):
+    for feature_vector in cluster:
+        if(feature_vector.isCentroid==True):
+            return feature_vector
+
+def GetAngolo(posincrocio, poscentroide,pos):
+    ipotenusa= GetDistanza(pos,posincrocio)
+    cateto=GetDistanza(posincrocio,poscentroide)
+
+    if(cateto<ipotenusa):
+        angolo=(math.acos(cateto/ipotenusa)*180)/math.pi
+    else:
+        angolo=(math.acos(ipotenusa/cateto)*180)/math.pi
+
+    return angolo
+def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters):
+    listaPunti=list()
+    while(True):
+        if(len(lista_clusters)==len(listaPunti)):
+            return listaPunti
+        linea= f.readline()
+        j+=1
+        parsedline= linea.split(' ')
+        pos = Position()
+        pos.x = float(parsedline[1].replace(',', '.'))
+        pos.y = float(parsedline[2].replace(',', '.'))
+        distanza = GetDistanza(pos, puntoincrocio)
+        print(linea+" ciao "+str(distanza))
+
+        timestampPos = parsedline[0]
+        if (distanza <= 71 and timestampPos != tmincrocio):
+            fv=FeatureVector()
+            fv.position=pos
+            fv.isCentroid=False
+            listaPunti.append(fv)
+
+        else:
+            return listaPunti
+
+
 def CalcolaAngolo(position1, position2):
     m=(position2.y-position1.y)/(position2.x-position1.x)
     angolo=(math.atan(m)*180)/math.pi
     return angolo
 def GetDistanza(position1, position2):
-    distanza = float (math.sqrt((float (position1.x)-float (position2.x))**2 + (float (position1.y)- float (position2.y))**2))
+    distanza = abs(float (math.sqrt((float (position1.x)-float (position2.x))**2 + (float (position1.y)- float (position2.y))**2)))
     return distanza
 def Confronto(listaVettoriVelocitaMedie, velocitaMedia):
     return
@@ -43,7 +115,6 @@ def CalcolaVelocitaVettorialeMedia(position1, position2, t1, t2):
     ##r2.append(ry2)
     velocita=[]
     intervallo_tempo=t2-t1
-    print(intervallo_tempo.total_seconds())
 
     velocita.append((position2.x-position1.x)/(intervallo_tempo.total_seconds()))
     velocita.append((position2.y-position1.y)/(intervallo_tempo.total_seconds()))
@@ -59,14 +130,18 @@ def RecontructPathLogs(pathDirectoryLog):
     f = open(pathLogUnico, "r")
     listasegmenti=list()
     j=0
-
+    incrocio=False
     flag=False
+
+    lista_clusters=list()
     index=0
+    listaPunti=None
+    puntoIncrocio=Position()
+    timestampIncrocio=""
     while(True):
         if(j==0):
 
             linea1=f.readline()
-
             if linea1 == "":
                                ##il log unico è vuoto
                 return
@@ -116,6 +191,7 @@ def RecontructPathLogs(pathDirectoryLog):
         p.y=float(parsedline[2].replace(',','.'))
         timestamp=parsedline[0]
         for i in range(0,len(listasegmenti)):
+
             s=listasegmenti[i][len(listasegmenti[i])-1]
             if(s=="fine_segmento"):
                 continue
@@ -132,43 +208,29 @@ def RecontructPathLogs(pathDirectoryLog):
                 lastPosition0.y = float(parsed[2].replace(',', '.'))
                 t0=datetime.strptime(parsed[0],("%H:%M:%S"))
 
-
-
+                puntoIncrocio=pos
+                timestampIncrocio=timestampPos
                 tm=datetime.strptime(timestampPos,("%H:%M:%S"))
-                print(tm.strftime("%H:%M:%S")+" "+t0.strftime("%H:%M:%S"))
                 v1=CalcolaVelocitaVettorialeMedia(lastPosition0, pos,t0,tm)
                 p2=Position()
                 p2.x=pos.x+v1[0]
                 p2.y=pos.y+v1[1]
-                print(str(p2.x)+" "+str(p2.y))
-                lineaNuova= f.readline()
-                lineaNuovaParsata=lineaNuova.split(' ')
-                posNuova = Position()
-                posNuova.x = float(lineaNuovaParsata[1].replace(',', '.'))
-                posNuova.y = float(lineaNuovaParsata[2].replace(',', '.'))
-                if(p2.x==posNuova.x and p2.y==posNuova.y):
-                    listasegmenti[i].append(lineaNuova)
-                    index = i
-                    flag = True
-                    continue
-                else:
-                    listasegmenti[index].append("fine_segmento")
-                    listasegmenti[i].append("fine_segmento")
-                    nuovosegmento=list()
-                    nuovosegmento.append(linea)
-                    nuovosegmento.append(f.readline())
-                    listasegmenti.append(nuovosegmento)
-                    nuovosegmento = list()
-                    nuovosegmento.append(linea)
+                centroid=FeatureVector()
+                centroid.position=p2
+                centroid.id_segment=i
+                centroid.isCentroid=True
+                cluster_nuovo=list()
+                cluster_nuovo.append(centroid)
+                lista_clusters.append(cluster_nuovo)
+                index = i
 
-                    nuovosegmento.append(f.readline())
-                    listasegmenti.append(nuovosegmento)
 
-            if(distanza<=71 and timestampPos!=timestamp):
 
-                        listasegmenti[i].append(linea)
-                        index=i
-                        flag=True
+            if(distanza<=71 and timestampPos!=timestamp ):
+
+                    listasegmenti[i].append(linea)
+                    index=i
+                    flag=True
 
 
             if(flag==False ):
@@ -177,12 +239,46 @@ def RecontructPathLogs(pathDirectoryLog):
                 listasegmenti.append(segmentonuovo)
                 flag=False
 
+            if (i == len(listasegmenti) - 1):
+                if(not lista_clusters):
+                    continue
+                listaPunti=GetPuntiDopoIncrocio(puntoIncrocio,timestampIncrocio,f, j, lista_clusters)
+
+                for cluster in lista_clusters:
+                    centroide = GetCentroid(cluster)
+                    setFeatureVectorsInCluster(puntoIncrocio, centroide, listaPunti, cluster)
 
 
 
 
+                while(True):
+                    if(not lista_clusters):
+                        listaPunti.clear()
+                        break
+
+                    for cluster in lista_clusters:
+
+                        if(len(cluster)==2):
+
+                            centro = GetCentroid(cluster)
+                            fv=None
+                            if(cluster[0].position.x==centro.position.x and
+                                    cluster[0].position.y==centro.position.y):
+                                fv=cluster[1]
+                            elif(cluster[1].position.x==centro.position.x and
+                                 cluster[1].position.y==centro.position.y):
+                                fv=cluster[0]
 
 
+                            t=datetime.strptime(timestampIncrocio,("%H:%M:%S"))
+                            t+=timedelta(seconds=1)
+
+                            ##qui sotto assegno il feature vector al segmento giusto
+                            listasegmenti[centro.id_segment].append(t.strftime("%H:%M:%S")+" "+str(fv.position.x)+" "+str(fv.position.y))
+                            ##ora sfoltisco i cluster da questo fv
+                            EliminaVectorDaiCluster(lista_clusters, fv)
+                            ##ora rimuovo il cluster perché non serve più
+                            lista_clusters.remove(cluster)
 
 
 

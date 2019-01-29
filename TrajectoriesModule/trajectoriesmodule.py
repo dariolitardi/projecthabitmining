@@ -84,7 +84,7 @@ def main():
     #lettura dei pathlog della simulazione
     files = glob.glob(path)
     listafile=list()
-
+    flag=False
 
     for name in files:
         try:
@@ -108,7 +108,7 @@ def main():
         if( not listapuntatorilinee):
             datasetfile.close()
 
-            traj_reconstructor.RecontructPathLogs(root.directory)
+            #traj_reconstructor.RecontructPathLogs(root.directory)
             #trajectories_drawer.TestApp().run()
             return
 
@@ -121,21 +121,26 @@ def main():
         posizione=(parsedstring[3])
 
         ##scrivi tsminimo in log
-
-        datasetfile.write(timestampmin+" "+posizione)
+        if (flag == True):
+            datasetfile.write("\n")
+            flag=False
+            datasetfile.write(timestampmin+" "+posizione)
+        else:
+            datasetfile.write(timestampmin+" "+posizione)
 
 
         ##rimuovo tsmin da listapuntatorilinee
         ##file tsminimo leggo una nuova linea e lo schiaffo in listapuntatorilinee
+
         parsedline=listafile[idfiletsminimo].readline().split(' ')
         line=parsedline[0]
 
         if(line=="" and len(listapuntatorilinee)!=0):
-            datasetfile.write("\n")
-        if (line == "" and len(listapuntatorilinee) == 0):
+            flag=True
+        elif (line == "" and len(listapuntatorilinee) == 0):
             return
 
-        if (line != ""):
+        elif (line != ""):
 
                 listapuntatorilinee.append(line+"-"+str(idfiletsminimo)+"-"+parsedline[1]+" "+parsedline[2])
 

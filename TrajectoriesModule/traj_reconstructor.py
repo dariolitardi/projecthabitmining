@@ -23,7 +23,30 @@ class FeatureVector:
     distance=0
     angle=0
     isCentroid=False
+def GetDistanzaMinima(lista_segmenti, pos):
+    linea=lista_segmenti[0][len(lista_segmenti[0])-1]
+    parsedline = linea.split(' ')
+    p = Position()
+    j = 0
+    p.x = float(parsedline[1].replace(',', '.'))
+    p.y = float(parsedline[2].replace(',', '.'))
+    distanza=GetDistanza(p,pos)
 
+    for i in range(1,len(lista_segmenti)):
+        linea = lista_segmenti[i][len(lista_segmenti[i]) - 1]
+        parsedline = linea.split(' ')
+        ps = Position()
+        ps.x = float(parsedline[1].replace(',', '.'))
+        ps.y = float(parsedline[2].replace(',', '.'))
+        d2=GetDistanza(ps, pos)
+        if(d2<10 or distanza<10):
+            continue
+        if(d2<distanza ):
+            p=ps
+            distanza=GetDistanza(p,pos)
+            j=i
+
+    return j
 def EliminaVectorDaiCluster(lista_clusters,fv):
     for cluster in lista_clusters:
         for v in cluster:
@@ -31,7 +54,9 @@ def EliminaVectorDaiCluster(lista_clusters,fv):
 
                 cluster.remove(v)
 def setFeatureVectorsInCluster(posincrocio,centroide, listaPunti, cluster):
+
     for feature_vector in listaPunti:
+
         d = GetDistanza(centroide.position, feature_vector.position)
         if(d>=70):
             continue
@@ -44,7 +69,7 @@ def setFeatureVectorsInCluster(posincrocio,centroide, listaPunti, cluster):
 
 
             cluster.append(feature_vector)
-
+            print(str(feature_vector.position.x) + " " + str(feature_vector.position.y) + "fv")
 
 
 def GetCentroid(cluster):
@@ -64,7 +89,9 @@ def GetAngolo(posincrocio, poscentroide,pos):
     return angolo
 def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters):
     listaPunti=list()
+    c=0
     while(True):
+        c+=1
         if(len(lista_clusters)==len(listaPunti)):
             return listaPunti
         linea= f.readline()
@@ -74,17 +101,15 @@ def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters):
         pos.x = float(parsedline[1].replace(',', '.'))
         pos.y = float(parsedline[2].replace(',', '.'))
         distanza = GetDistanza(pos, puntoincrocio)
-        print(linea+" ciao "+str(distanza))
+        #print(linea+" ciao "+str(distanza))
 
         timestampPos = parsedline[0]
-        if (distanza <= 71 and timestampPos != tmincrocio):
+        if (distanza <= 71 and timestampPos != tmincrocio and distanza>1):
             fv=FeatureVector()
             fv.position=pos
             fv.isCentroid=False
             listaPunti.append(fv)
 
-        else:
-            return listaPunti
 
 
 def CalcolaAngolo(position1, position2):
@@ -160,7 +185,7 @@ def RecontructPathLogs(pathDirectoryLog):
             p1.x =float(parsedline2[1].replace(',','.'))
             p1.y =float(parsedline2[2].replace(',','.'))
             distanza=GetDistanza(p0,p1)
-            if(distanza>=25):
+            if(distanza>71):
                 lista0=list()
                 lista1=list()
                 lista0.append(linea1)
@@ -191,10 +216,9 @@ def RecontructPathLogs(pathDirectoryLog):
         p.y=float(parsedline[2].replace(',','.'))
         timestamp=parsedline[0]
         for i in range(0,len(listasegmenti)):
-
             s=listasegmenti[i][len(listasegmenti[i])-1]
-            if(s=="fine_segmento"):
-                continue
+            #print(len(listasegmenti))
+
             parsedline = s.split(' ')
             pos = Position()
             pos.x = float(parsedline[1].replace(',','.'))
@@ -220,6 +244,8 @@ def RecontructPathLogs(pathDirectoryLog):
                 centroid.id_segment=i
                 centroid.isCentroid=True
                 cluster_nuovo=list()
+                #print(str(pos.x)+" "+str(pos.y)+"c")
+
                 cluster_nuovo.append(centroid)
                 lista_clusters.append(cluster_nuovo)
                 index = i
@@ -227,13 +253,22 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
             if(distanza<=71 and timestampPos!=timestamp ):
+                if(incrocio):
 
-                    listasegmenti[i].append(linea)
-                    index=i
-                    flag=True
+                    k=GetDistanzaMinima(listasegmenti, p)
+                    listasegmenti[k].append(linea)
+
+                    index = k
+                    flag = True
+                else:
+                        listasegmenti[i].append(linea)
+
+                        index = i
+                        flag = True
 
 
-            if(flag==False ):
+            if(flag==False and i == len(listasegmenti) - 1):
+                #print("ciaoo")
                 segmentonuovo = list()
                 segmentonuovo.append(linea)
                 listasegmenti.append(segmentonuovo)
@@ -243,9 +278,13 @@ def RecontructPathLogs(pathDirectoryLog):
                 if(not lista_clusters):
                     continue
                 listaPunti=GetPuntiDopoIncrocio(puntoIncrocio,timestampIncrocio,f, j, lista_clusters)
+                incrocio=True
+                print(len(listaPunti))
 
                 for cluster in lista_clusters:
                     centroide = GetCentroid(cluster)
+                    print(str(centroide.position.x)+" "+str(centroide.position.y)+"ce")
+
                     setFeatureVectorsInCluster(puntoIncrocio, centroide, listaPunti, cluster)
 
 
@@ -272,9 +311,9 @@ def RecontructPathLogs(pathDirectoryLog):
 
                             t=datetime.strptime(timestampIncrocio,("%H:%M:%S"))
                             t+=timedelta(seconds=1)
-
                             ##qui sotto assegno il feature vector al segmento giusto
                             listasegmenti[centro.id_segment].append(t.strftime("%H:%M:%S")+" "+str(fv.position.x)+" "+str(fv.position.y))
+
                             ##ora sfoltisco i cluster da questo fv
                             EliminaVectorDaiCluster(lista_clusters, fv)
                             ##ora rimuovo il cluster perché non serve più

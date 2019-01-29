@@ -108,7 +108,7 @@ def main():
         if( not listapuntatorilinee):
             datasetfile.close()
 
-            #traj_reconstructor.RecontructPathLogs(root.directory)
+            traj_reconstructor.RecontructPathLogs(root.directory)
             #trajectories_drawer.TestApp().run()
             return
 
@@ -120,13 +120,8 @@ def main():
         idfiletsminimo=int(parsedstring[2])
         posizione=(parsedstring[3])
 
-        ##scrivi tsminimo in log
-        if (flag == True):
-            datasetfile.write("\n")
-            flag=False
-            datasetfile.write(timestampmin+" "+posizione)
-        else:
-            datasetfile.write(timestampmin+" "+posizione)
+
+        datasetfile.write(timestampmin+" "+posizione)
 
 
         ##rimuovo tsmin da listapuntatorilinee
@@ -136,11 +131,11 @@ def main():
         line=parsedline[0]
 
         if(line=="" and len(listapuntatorilinee)!=0):
-            flag=True
-        elif (line == "" and len(listapuntatorilinee) == 0):
+            datasetfile.write( "\n")
+        if (line == "" and len(listapuntatorilinee) == 0):
             return
 
-        elif (line != ""):
+        if (line != ""):
 
                 listapuntatorilinee.append(line+"-"+str(idfiletsminimo)+"-"+parsedline[1]+" "+parsedline[2])
 

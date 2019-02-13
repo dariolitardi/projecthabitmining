@@ -53,6 +53,7 @@ sofa 400 400
 shower_stall 1450 400
 coat_hangers 650 400
 table 850 1050
+p23 950 450
 
 Walls
 p1 p2
@@ -76,28 +77,4 @@ p1 p5
 p20 p25
 
 Sensors
-e1 800 350 0 type1
-e2 1200 350 0 type1
-e3 1200 550 0 type1
-e4 800 550 0 type1
-dr1 250 350 0 type1
-dr2 450 350 0 type1
-dr3 250 550 0 type1
-dr4 450 550 0 type1
-dr5 250 750 0 type1
-dr6 450 750 0 type1
-dr7 250 950 0 type1
-dr8 450 950 0 type1
-dr9 250 1150 0 type1
-dr10 450 1150 0 type1
-k1 800 950 0 type1
-k2 1000 950 0 type1
-k3 1200 950 0 type1
-k4 800 1150 0 type1
-k5 1000 1150 0 type1
-k6 1200 1150 0 type1
-c1 1500 600 0 type1
-c2 1700 600 0 type1
-c3 1900 600 0 type1
-
 

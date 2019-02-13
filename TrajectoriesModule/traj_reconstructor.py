@@ -10,6 +10,7 @@ from datetime import timedelta
 import sqlite3
 import time
 import kalman_filter
+import performance_test
 
 
 class Position:
@@ -234,6 +235,7 @@ def RecontructPathLogs(pathDirectoryLog):
         if(linea=="" or j==1000 ):
             print(len(listasegmenti))
             ConstructDatabase(listasegmenti, pathDirectoryLog)
+            performance_test.test_kalmanfilter(pathDirectoryLog)
             return
 
 
@@ -260,12 +262,13 @@ def RecontructPathLogs(pathDirectoryLog):
                 lastPosition0=Position()
                 lastPosition0.x = float(parsed[1].replace(',', '.'))
                 lastPosition0.y = float(parsed[2].replace(',', '.'))
-                t0=datetime.strptime(parsed[0],("%H:%M:%S"))
+                t0=datetime.strptime(parsed[0],("%H:%M:%S.%f"))
+
                 parsed = listasegmenti[i][len(listasegmenti[i]) - 3].split(' ')
                 lastPosition1 = Position()
                 lastPosition1.x = float(parsed[1].replace(',', '.'))
                 lastPosition1.y = float(parsed[2].replace(',', '.'))
-                t1 = datetime.strptime(parsed[0], ("%H:%M:%S"))
+                t1 = datetime.strptime(parsed[0], ("%H:%M:%S.%f"))
                 cluster=Cluster()
                 cluster.lista_posizioni=list()
                 cluster.lista_posizioni.append(lastPosition1)
@@ -275,7 +278,7 @@ def RecontructPathLogs(pathDirectoryLog):
                 lista_clusters.append(cluster)
                 puntoIncrocio=pos
                 timestampIncrocio=timestampPos
-                tm=datetime.strptime(timestampPos,("%H:%M:%S"))
+                tm=datetime.strptime(timestampPos,("%H:%M:%S.%f"))
                 print (str(cluster.id_segment)+"id")
 
                 print (str(len(cluster.lista_posizioni))+"len")
@@ -339,11 +342,11 @@ def RecontructPathLogs(pathDirectoryLog):
                             pMin=listaPC[g]
 
                     #print( str(pMin.position.x) + " " + str(pMin.position.y)+" "+str(pMin.distanza))
-                    t = datetime.strptime(timestampIncrocio, ("%H:%M:%S"))
+                    t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
                     t += timedelta(seconds=1)
                     ##qui sotto assegno il feature vector al segmento giusto
                     listasegmenti[pMin.id_segment].append(
-                        t.strftime("%H:%M:%S") + " " + str(pMin.position.x) + " " + str(pMin.position.y))
+                        t.strftime("%H:%M:%S.%f") + " " + str(pMin.position.x) + " " + str(pMin.position.y))
                     #print(str(pMin.position.x)+" "+ str(pMin.position.y) +" "+str(pMin.id_segment))
                     listaPC=SfoltisciLista(listaPC, pMin)
 

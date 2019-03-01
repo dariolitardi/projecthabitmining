@@ -157,7 +157,7 @@ def CalcolaMinimoTimestamp(listatimestamp):
             posizionemin=posizionemin2
 
 
-    s= timestampmin.strftime("%H:%M:%S.%f")+"-"+str(c)+"-"+str(idfilemin)+"-"+ posizionemin
+    s= timestampmin.strftime("%H:%M:%S.%f")[:-3]+"-"+str(c)+"-"+str(idfilemin)+"-"+ posizionemin
     return s
 
 def LeggiLinea(listafile):

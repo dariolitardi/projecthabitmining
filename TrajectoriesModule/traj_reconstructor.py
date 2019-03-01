@@ -1,7 +1,3 @@
-import glob
-import errno
-import os
-import random
 import datetime
 import random
 import math
@@ -11,8 +7,14 @@ import sqlite3
 import time
 import kalman_filter
 import performance_test
+import collections
 
-
+from collections import Counter
+class Incrocio:
+    position=None
+    timestamp=None
+    id_val=0
+    count=0
 class Position:
     x = 0
     y = 0
@@ -25,17 +27,151 @@ class PositionCrossing:
     distanza=0
     id_segment=0
     position=None
+def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
+
+
+    listaAppoggio=list()
+    while(True):
+
+        while(linea.split(' ')[0]==timestamp ):
+
+            parsedline = linea.split(' ')
+
+            pos = Position()
+            pos.x = float(parsedline[1].replace(',', '.'))
+            pos.y = float(parsedline[2].replace(',', '.'))
+
+            timestampPos = parsedline[0]
+            listaAppoggio.append(pos)
+
+            linea = f.readline()
+
+        duplicates=[]
+        noduplicates=[]
+        for elem in listaAppoggio:
+
+            if (isContainedDuplicati(listaAppoggio, elem) > 1):
+                duplicates.append(elem)
+            elif (isContainedDuplicati(listaAppoggio, elem) == 1):
+                print(str(elem.x)+" "+str(elem.y)+" nodupp")
+                noduplicates.append(elem)
+        if(not duplicates):
+
+            listasegmenti[ind].append("fine_segmento")
+            parsedline = linea.split(' ')
+            p = Position()
+            p.x = float(parsedline[1].replace(',', '.'))
+            p.y = float(parsedline[2].replace(',', '.'))
+            timestm = parsedline[0]
+            for  e in noduplicates:
+
+                segmentonuovo=list()
+                segmentonuovo.append(timestamp+" "+str(e.x)+" "+str(e.y))
+
+                listasegmenti.append(segmentonuovo)
+
+            for i in range(0, len(listasegmenti)):
+                s = listasegmenti[i][len(listasegmenti[i]) - 1]
+                if (s == "fine_segmento"):
+                    continue
+
+                parsedline = s.split(' ')
+                pos = Position()
+                pos.x = float(parsedline[1].replace(',', '.'))
+                pos.y = float(parsedline[2].replace(',', '.'))
+                distanza = GetDistanza(pos, p)
+                timestampPos2 = parsedline[0]
+
+                if (distanza <= 71 and timestm!=timestampPos2):
+                    listasegmenti[i].append(linea)
+                    return
+
+            #print(linea)
+            return
+        else:
+            for e in noduplicates:
+                print(str(e.x)+" "+str(e.y)+" rrrr")
+
+                for i in range(0, len(listasegmenti)):
+                    s = listasegmenti[i][len(listasegmenti[i]) - 1]
+                    if (s == "fine_segmento"):
+                        continue
+
+                    parsedline = s.split(' ')
+                    pos = Position()
+                    pos.x = float(parsedline[1].replace(',', '.'))
+                    pos.y = float(parsedline[2].replace(',', '.'))
+                    distanza = GetDistanza(pos, e)
+                    timestampPos2 = parsedline[0]
+
+                    if (distanza <= 71 and timestampPos2!=timestamp):
+                        listasegmenti[i].append(timestamp+" "+str(e.x)+" "+str(e.y))
+                        continue
+
+        for dup in duplicates:
+            listasegmenti[ind].append(timestamp+" "+str(dup.x)+" "+str(dup.y))
+        for nondup in noduplicates:
+            for i in range(0, len(listasegmenti)):
+                s = listasegmenti[i][len(listasegmenti[i]) - 1]
+                if (s == "fine_segmento"):
+                    continue
+
+                parsedline = s.split(' ')
+                p = Position()
+                p.x = float(parsedline[1].replace(',', '.'))
+                p.y = float(parsedline[2].replace(',', '.'))
+                distanza = GetDistanza(p, nondup)
+                timestampPos = parsedline[0]
+                if(distanza<=71 and timestamp!=timestampPos):
+                    listasegmenti[i].append(timestamp + " " + str(nondup.x) + " " + str(nondup.y))
+                    continue
+        t = datetime.strptime(timestamp, ("%H:%M:%S.%f"))
+        t += timedelta(milliseconds=1000)
+        tm = t.strftime("%H:%M:%S.%f")[:-3]
+        timestamp=tm
+        duplicates = []
+        noduplicates = []
+        listaAppoggio[:]=[]
+
+
+def isContained(lista_incroci, inc):
+    for elem in lista_incroci:
+        if (inc.position.x==elem.position.x and inc.position.y==elem.position.y and inc.timestamp==elem.timestamp):
+            return True
+
+    return False
+
+def isContainedDuplicati(lista, pos):
+    contatore=0
+    for elem in lista:
+        if (pos.x==elem.x and pos.y==elem.y):
+            contatore+=1
+
+    return contatore
+
+def isContainedPunti(listaPunti, punto):
+    for elem in listaPunti:
+        if (punto.x==elem.x and punto.y==(elem.y)):
+            return True
+
+    return False
+def isContainedPuntiPC(listaPC, punto):
+    for elem in listaPC:
+        if (punto.x==elem.position.x and punto.y==(elem.position.y)):
+            return True
+
+    return False
 
 def SfoltisciLista(lista,positionCrossing):
     listaAppoggio=list()
-    print(str(positionCrossing.position.x )+" "+str(positionCrossing.position.y )+" "+str(positionCrossing.distanza ))
-
+    flag=False
     for elem in lista:
+
         if (elem.position.x!=positionCrossing.position.x or
                 elem.position.y != positionCrossing.position.y  ):
             if (elem.id_segment != positionCrossing.id_segment):
-                print("ciaone")
                 listaAppoggio.append(elem)
+
     return listaAppoggio
 
 
@@ -49,7 +185,6 @@ def GetPuntoPiuVicino(cluster, listaPunti, lista):
         p.distanza=distanza
         p.id_segment=cluster.id_segment
         p.position=pos
-        #print(str(pos.x)+" "+str(pos.y)+" "+str(distanza)+"c"+str(cluster.id_segment))
         lista.append(p)
 
     return
@@ -101,7 +236,6 @@ def setFeatureVectorsInCluster(posincrocio,centroide, listaPunti, cluster):
 
 
             cluster.append(feature_vector)
-            print(str(feature_vector.position.x) + " " + str(feature_vector.position.y) + "fv")
 
 
 def GetCentroid(cluster):
@@ -119,24 +253,52 @@ def GetAngolo(posincrocio, poscentroide,pos):
         angolo=(math.acos(ipotenusa/cateto)*180)/math.pi
 
     return angolo
-def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters):
+def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters,linea, listasegmenti):
     listaPunti=list()
     c=0
     while(True):
-        c+=1
+
         if(len(lista_clusters)==len(listaPunti)):
             return listaPunti
-        linea= f.readline()
+        if(c!=0):
+
+            linea= f.readline()
+            print(linea + " jjjj")
+            if (linea.split(' ')[0] == tmincrocio):
+                parsedline = linea.split(' ')
+                pos1 = Position()
+                pos1.x = float(parsedline[1].replace(',', '.'))
+                pos1.y = float(parsedline[2].replace(',', '.'))
+                timestampPos1 = parsedline[0]
+
+                for i in range(0, len(listasegmenti)):
+                    s = listasegmenti[i][len(listasegmenti[i]) - 1]
+                    if (s == "fine_segmento"):
+                        continue
+
+                    parsedline = s.split(' ')
+                    pos2 = Position()
+                    pos2.x = float(parsedline[1].replace(',', '.'))
+                    pos2.y = float(parsedline[2].replace(',', '.'))
+                    distanza = GetDistanza(pos1, pos2)
+                    timestampPos2 = parsedline[0]
+
+                    if (distanza <= 71 and timestampPos1 != timestampPos2):  ##qua trova l'incrocio
+                        listasegmenti[i].append(linea)
+                        continue
+
+
+
+        c += 1
         j+=1
         parsedline= linea.split(' ')
         pos = Position()
         pos.x = float(parsedline[1].replace(',', '.'))
         pos.y = float(parsedline[2].replace(',', '.'))
         distanza = GetDistanza(pos, puntoincrocio)
-        #print(linea+" ciao "+str(distanza))
 
         timestampPos = parsedline[0]
-        if (distanza <= 71 and timestampPos != tmincrocio and distanza>1):
+        if (distanza <= 71 and timestampPos != tmincrocio ):
 
 
             listaPunti.append(pos)
@@ -181,19 +343,22 @@ def CalcolaVelocitaVettorialeMedia(position1, position2, t1, t2):
 def select_authorizer(*args):
     return sqlite3.SQLITE_OK
 def RecontructPathLogs(pathDirectoryLog):
-
+    listaIncroci=list()
     pathLogUnico = pathDirectoryLog+"\\DatasetPaths.txt"
     f = open(pathLogUnico, "r")
+    file_pt=None
     listasegmenti=list()
     j=0
     incrocio=False
     flag=False
-
+    lista_incroci=list()
     lista_clusters=list()
+    flagParallelismo=False
     index=0
     listaPunti=None
     puntoIncrocio=Position()
     timestampIncrocio=""
+    decisioniTotali=0
     while(True):
         if(j==0):
 
@@ -231,13 +396,15 @@ def RecontructPathLogs(pathDirectoryLog):
                 listasegmenti.append(lista0)
 
         j+=1
-        linea=f.readline()
-        if(linea=="" or j==1000 ):
+        if( incrocio==False):
+            linea=f.readline()
+            incrocio=False
+
+        if(len(linea.strip()) == 0   ):
             print(len(listasegmenti))
             ConstructDatabase(listasegmenti, pathDirectoryLog)
-            performance_test.test_kalmanfilter(pathDirectoryLog)
+            performance_test.test_kalmanfilter(decisioniTotali,lista_incroci,pathDirectoryLog)
             return
-
 
 
 
@@ -249,7 +416,8 @@ def RecontructPathLogs(pathDirectoryLog):
         timestamp=parsedline[0]
         for i in range(0,len(listasegmenti)):
             s=listasegmenti[i][len(listasegmenti[i])-1]
-            #print(len(listasegmenti))
+            if(s=="fine_segmento"):
+                continue
 
             parsedline = s.split(' ')
             pos = Position()
@@ -257,7 +425,14 @@ def RecontructPathLogs(pathDirectoryLog):
             pos.y = float(parsedline[2].replace(',','.'))
             distanza=GetDistanza(p,pos)
             timestampPos=parsedline[0]
-            if(distanza==0 and timestamp==timestampPos): ##qua trova l'incrocio
+
+
+            if(distanza==0 and timestamp==timestampPos  ): ##qua trova l'incrocio
+                #print(timestamp)
+                #print(str(p.x)+" "+ str(p.y ))
+                print("INCCC")
+                #print(str(pos.x) +" "+str(pos.y))
+
                 parsed=listasegmenti[i][len(listasegmenti[i])-2].split(' ')
                 lastPosition0=Position()
                 lastPosition0.x = float(parsed[1].replace(',', '.'))
@@ -265,6 +440,7 @@ def RecontructPathLogs(pathDirectoryLog):
                 t0=datetime.strptime(parsed[0],("%H:%M:%S.%f"))
 
                 parsed = listasegmenti[i][len(listasegmenti[i]) - 3].split(' ')
+
                 lastPosition1 = Position()
                 lastPosition1.x = float(parsed[1].replace(',', '.'))
                 lastPosition1.y = float(parsed[2].replace(',', '.'))
@@ -279,27 +455,26 @@ def RecontructPathLogs(pathDirectoryLog):
                 puntoIncrocio=pos
                 timestampIncrocio=timestampPos
                 tm=datetime.strptime(timestampPos,("%H:%M:%S.%f"))
-                print (str(cluster.id_segment)+"id")
 
-                print (str(len(cluster.lista_posizioni))+"len")
-                print (str(len(lista_clusters))+"len2")
-
-                #print(str(pos.x)+" "+str(pos.y)+"c")
                 incrocio=True
 
                 index = i
 
 
 
+
+
             if(distanza<=71 and timestampPos!=timestamp ):
+
                 if(incrocio):
 
-                    k=GetDistanzaMinima(listasegmenti, p)
-                    listasegmenti[k].append(linea)
-
-                    index = k
+                    #k=GetDistanzaMinima(listasegmenti, p)
+                    listasegmenti[i].append(linea)
+                    index = i
                     flag = True
                 else:
+
+
                         listasegmenti[i].append(linea)
 
                         index = i
@@ -307,65 +482,157 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
             if(flag==False and i == len(listasegmenti) - 1):
-                #print("ciaoo")
                 segmentonuovo = list()
                 segmentonuovo.append(linea)
                 listasegmenti.append(segmentonuovo)
                 flag=False
-            if(i == len(listasegmenti) - 1):
+            if(i == len(listasegmenti) - 1 and incrocio):
+                file_pt=f
+                print(linea+" hhh"+ timestamp)
+
+
                 if (not lista_clusters):
                     continue
-                incrocio = True
-                listaPunti = GetPuntiDopoIncrocio(puntoIncrocio, timestampIncrocio, f, j, lista_clusters)
-                print(str(len(listaPunti))+"lenp")
+                incrocio = False
+
+                inc=Incrocio()
+                inc.timestamp=timestampIncrocio
+                inc.position=puntoIncrocio
+                if(isContained(lista_incroci, inc)==False):
+                    lista_incroci.append(inc)
+
+
+                listaPunti = GetPuntiDopoIncrocio(puntoIncrocio, timestampIncrocio, f, j, lista_clusters,linea,listasegmenti)
+
+                duplicates = []
+                noduplicates = []
+
+                for elem in listaPunti:
+                    print(str(elem.x)+" "+str(elem.y)+" boooo")
+                    if(isContainedDuplicati(listaPunti,elem)>1):
+                        duplicates.append(elem)
+                    elif(isContainedDuplicati(listaPunti,elem)==1):
+                        noduplicates.append(elem)
+
+
+
+
+                t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
+                t += timedelta(milliseconds=1000)
+                timest = t.strftime("%H:%M:%S.%f")[:-3]
+
+                for nodup in noduplicates:
+                        print("CIAOONE")
+                        for r in range(0, len(listasegmenti)):
+                            s = listasegmenti[r][len(listasegmenti[r]) - 1]
+                            if (s == "fine_segmento"):
+                                continue
+
+                            parsedline = s.split(' ')
+                            pos = Position()
+                            pos.x = float(parsedline[1].replace(',', '.'))
+                            pos.y = float(parsedline[2].replace(',', '.'))
+                            distanza = GetDistanza(nodup, pos)
+                            timestampPos = parsedline[0]
+                            if(distanza<=71 and timest!=timestampPos):
+                                listasegmenti[r].append(timest+" "+str(nodup.x)+" "+str(nodup.y))
+                                continue
+
+
+
                 listaPC=[]
                 fi=0
+                decisioniTotali+=len(lista_clusters)
                 for m in range(0,len(listaPunti)):
                     for n in range(0,len(lista_clusters)):
+                            d=kalman_filter.kalman_filter_position(lista_clusters[n],listaPunti[m])
 
-                        d=kalman_filter.kalman_filter_position(lista_clusters[n],listaPunti[m])
-                        pc=PositionCrossing()
-                        pc.id_segment=lista_clusters[n].id_segment
-                        pc.position=listaPunti[m]
-                        pc.distanza=d
-                        listaPC.append(pc)
 
-                        fi+=1
+                            pc=PositionCrossing()
+                            pc.id_segment=lista_clusters[n].id_segment
+                            pc.position=listaPunti[m]
+                            pc.distanza=d
+                            listaPC.append(pc)
 
-                for gi in range(0,len(listaPC)):
-                    print(str(listaPC[gi].distanza) + " " + str(listaPC[gi].id_segment) + " " +
-                          str(listaPC[gi].position.x) + " " + str(listaPC[gi].position.y))
+                            fi+=1
+
+
+                ind=0
+                lastTM=None
                 while(listaPC):
-                    pMin=listaPC[0]
-                    for g in range(1,len(listaPC)):
-                        if(listaPC[g].distanza<pMin.distanza):
-                            pMin=listaPC[g]
+                        pMin=listaPC[0]
+                        for g in range(1,len(listaPC)):
+                            if(listaPC[g].distanza<pMin.distanza):
+                                pMin=listaPC[g]
+                        if (isContainedDuplicati(duplicates, pMin.position) > 1):
+                                flagParallelismo = True
+                                t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
+                                t += timedelta(milliseconds=1000)
+                                listasegmenti[pMin.id_segment].append("fine_segmento")
+                                segnuovo = list()
+                                lastTM=t.strftime("%H:%M:%S.%f")[:-3]
+                                for dup in duplicates:
 
-                    #print( str(pMin.position.x) + " " + str(pMin.position.y)+" "+str(pMin.distanza))
-                    t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
-                    t += timedelta(seconds=1)
-                    ##qui sotto assegno il feature vector al segmento giusto
-                    listasegmenti[pMin.id_segment].append(
-                        t.strftime("%H:%M:%S.%f") + " " + str(pMin.position.x) + " " + str(pMin.position.y))
-                    #print(str(pMin.position.x)+" "+ str(pMin.position.y) +" "+str(pMin.id_segment))
-                    listaPC=SfoltisciLista(listaPC, pMin)
+                                    segnuovo.append(t.strftime("%H:%M:%S.%f")[:-3] + " " + str(pMin.position.x) + " " +
+                                                str(pMin.position.y))
 
-                    print(str(len(listaPC))+"lenpc")
-
-
-                listaPunti.clear()
-                lista_clusters.clear()
-
+                                listasegmenti.append(segnuovo)
+                                ind=len(listasegmenti)-1
 
 
+                        t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
+                        t += timedelta(milliseconds=1000)
+                        ##qui sotto assegno il feature vector al segmento giusto
+                        if (listasegmenti[pMin.id_segment][len(listasegmenti[pMin.id_segment]) - 1] != "fine_segmento"):
+                            listasegmenti[pMin.id_segment].append(
+                                t.strftime("%H:%M:%S.%f")[:-3] + " " + str(pMin.position.x) + " " + str(
+                                    pMin.position.y))
 
 
+                        listaPC=SfoltisciLista(listaPC, pMin)
 
+                if(not flagParallelismo):
+                    listaPunti.clear()
 
+                if(len(duplicates)!=0):
+                    t = datetime.strptime(lastTM, ("%H:%M:%S.%f"))
+                    t += timedelta(milliseconds=1000)
+                    lastTM = t.strftime("%H:%M:%S.%f")[:-3]
+                    linea=f.readline()
+                    print(linea+" "+lastTM)
+                    while(linea.split(' ')[0]!=lastTM):
+                        parsedline = linea.split(' ')
+                        p = Position()
+                        p.x = float(parsedline[1].replace(',', '.'))
+                        p.y = float(parsedline[2].replace(',', '.'))
+                        timestamp = parsedline[0]
+                        for i in range(0, len(listasegmenti)):
+                            s = listasegmenti[i][len(listasegmenti[i]) - 1]
+                            if (s == "fine_segmento"):
+                                continue
 
+                            parsedline = s.split(' ')
+                            pos = Position()
+                            pos.x = float(parsedline[1].replace(',', '.'))
+                            pos.y = float(parsedline[2].replace(',', '.'))
+                            distanza = GetDistanza(p, pos)
+                            timestampPos = parsedline[0]
 
+                            if (distanza <= 71 and timestamp != timestampPos):
+                                listasegmenti[i].append(linea)
 
+                        linea=f.readline()
 
+                    print(linea+" "+lastTM)
+
+                    LeggiParallelismi(listasegmenti,f,lastTM, ind,linea)
+
+                lista_clusters= []
+                noduplicates=[]
+                duplicates=[]
+                puntoIncrocio=None
+                timestampIncrocio=None
+                distanza=0
 
 
 

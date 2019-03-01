@@ -58,7 +58,7 @@ def kalman_filter_position(cluster,position):
     means, covariances = kf3.filter(measurements)
     kf3 = kf3.em(measurements, n_iter=5)
     (filtered_state_means, filtered_state_covariances) = kf3.filter(measurements)
-    print("Time to build and train kf3: %s seconds" % (time.time() - time_before))
+    #print("Time to build and train kf3: %s seconds" % (time.time() - time_before))
     n_timesteps = 4
     n_dim_state =  4
     filtered_state_means2 = np.zeros((n_timesteps, n_dim_state))

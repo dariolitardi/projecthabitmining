@@ -58,6 +58,8 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
 
             listasegmenti[ind].append("fine_segmento")
             parsedline = linea.split(' ')
+            if(len(linea.strip()) == 0 ):
+                return
             p = Position()
             p.x = float(parsedline[1].replace(',', '.'))
             p.y = float(parsedline[2].replace(',', '.'))
@@ -81,7 +83,7 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                 distanza = GetDistanza(pos, p)
                 timestampPos2 = parsedline[0]
 
-                if (distanza <= 71 and timestm!=timestampPos2):
+                if (distanza <= 15 and timestm!=timestampPos2):
                     listasegmenti[i].append(linea)
                     return
 
@@ -102,7 +104,7 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                     distanza = GetDistanza(pos, e)
                     timestampPos2 = parsedline[0]
 
-                    if (distanza <= 71 and timestampPos2!=timestamp):
+                    if (distanza <= 15 and timestampPos2!=timestamp):
                         listasegmenti[i].append(timestamp+" "+str(e.x)+" "+str(e.y))
                         continue
 
@@ -120,7 +122,7 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                 p.y = float(parsedline[2].replace(',', '.'))
                 distanza = GetDistanza(p, nondup)
                 timestampPos = parsedline[0]
-                if(distanza<=71 and timestamp!=timestampPos):
+                if(distanza<=15 and timestamp!=timestampPos):
                     listasegmenti[i].append(timestamp + " " + str(nondup.x) + " " + str(nondup.y))
                     continue
         t = datetime.strptime(timestamp, ("%H:%M:%S.%f"))
@@ -204,7 +206,7 @@ def GetDistanzaMinima(lista_segmenti, pos):
         ps.x = float(parsedline[1].replace(',', '.'))
         ps.y = float(parsedline[2].replace(',', '.'))
         d2=GetDistanza(ps, pos)
-        if(d2<10 or distanza<10):
+        if(d2<15 or distanza<15):
             continue
         if(d2<distanza ):
             p=ps
@@ -280,7 +282,7 @@ def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters,linea, lis
                     distanza = GetDistanza(pos1, pos2)
                     timestampPos2 = parsedline[0]
 
-                    if (distanza <= 71 and timestampPos1 != timestampPos2):  ##qua trova l'incrocio
+                    if (distanza <= 15 and timestampPos1 != timestampPos2):  ##qua trova l'incrocio
                         listasegmenti[i].append(linea)
                         continue
 
@@ -295,7 +297,7 @@ def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters,linea, lis
         distanza = GetDistanza(pos, puntoincrocio)
 
         timestampPos = parsedline[0]
-        if (distanza <= 71 and timestampPos != tmincrocio ):
+        if (distanza <= 15 and timestampPos != tmincrocio ):
 
             listaPunti.append(pos)
 
@@ -378,7 +380,7 @@ def RecontructPathLogs(pathDirectoryLog):
             p1.x =float(parsedline2[1].replace(',','.'))
             p1.y =float(parsedline2[2].replace(',','.'))
             distanza=GetDistanza(p0,p1)
-            if(distanza>71):
+            if(distanza>15):
                 lista0=list()
                 lista1=list()
                 lista0.append(linea1)
@@ -454,6 +456,7 @@ def RecontructPathLogs(pathDirectoryLog):
                 puntoIncrocio=pos
                 timestampIncrocio=timestampPos
                 tm=datetime.strptime(timestampPos,("%H:%M:%S.%f"))
+                print(str(pos.x) +" "+str(pos.y)+" "+timestampIncrocio)
 
                 incrocio=True
 
@@ -463,7 +466,7 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
 
-            if(distanza<=71 and timestampPos!=timestamp ):
+            if(distanza<=15 and timestampPos!=timestamp ):
 
                 if(incrocio):
 
@@ -528,7 +531,7 @@ def RecontructPathLogs(pathDirectoryLog):
                             pos.y = float(parsedline[2].replace(',', '.'))
                             distanza = GetDistanza(nodup, pos)
                             timestampPos = parsedline[0]
-                            if(distanza<=71 and timest!=timestampPos):
+                            if(distanza<=15 and timest!=timestampPos):
                                 listasegmenti[r].append(timest+" "+str(nodup.x)+" "+str(nodup.y))
                                 continue
 
@@ -633,6 +636,8 @@ def RecontructPathLogs(pathDirectoryLog):
                     linea=f.readline()
 
                     while(linea.split(' ')[0]!=lastTM):
+                        if (len(linea.strip()) == 0 ):
+                            break
                         parsedline = linea.split(' ')
                         p = Position()
                         p.x = float(parsedline[1].replace(',', '.'))
@@ -650,23 +655,21 @@ def RecontructPathLogs(pathDirectoryLog):
                             distanza = GetDistanza(p, pos)
                             timestampPos = parsedline[0]
 
-                            if (distanza <= 71 and timestamp != timestampPos):
+                            if (distanza <= 15 and timestamp != timestampPos):
                                 listasegmenti[i].append(linea)
 
                         linea=f.readline()
 
 
                     LeggiParallelismi(listasegmenti,f,lastTM, ind,linea)
-                else:
+
+                if(flagParallelismo==False):
+
                     inc.listaCluster = lista_seg
+
                     lista_incroci.append(inc)
-                    for cluster in inc.listaCluster:
-                        print("\n")
 
-                        for pos in cluster.lista_posizioni:
-                            print(str(pos.x) + " " + str(pos.y) + " fr")
-
-
+                flagParallelismo=False
                 lista_clusters= []
                 lista_seg=[]
                 noduplicates.clear()

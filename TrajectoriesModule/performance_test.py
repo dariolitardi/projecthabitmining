@@ -48,73 +48,71 @@ def isContainedDuplicatiId(lista, tupla, id_log):
 def GetDistanza(position1, position2):
     distanza = abs(float (math.sqrt((float (position1.x)-float (position2.x))**2 + (float (position1.y)- float (position2.y))**2)))
     return distanza
+
+def MioMetodo(listReal,listaCluster):
+    for cluster in listaCluster:
+
+            if (traiettoriaCoincidente(listReal, cluster.lista_posizioni) == True):
+                return True
+
+    for pos in listReal:
+        print(str(pos.x)+" "+str(pos.y)+" sbagliata")
+
+    return False
+
+
 def traiettoriaCoincidente(listReal, listRic):
-    print("ENTRAAAA")
     for i in range(0, len( listReal)):
-        for j in range(0, len( listRic)):
-            if(i==j):
-                #print(str(posReal.x)+ " "+str(posReal.y))
-                if(listReal[i].x!=listRic[j].x and listReal[i].y!=listRic[j].y ):
+                if(listReal[i].x!=listRic[i].x and listReal[i].y!=listRic[i].y ):
                     return False
 
+
     return True
+
+
+
+def Metodo(listaCluster,cl):
+    contatore = 0
+    for cluster in listaCluster:
+        if (cluster.lista_posizioni[0].x == cl.lista_posizioni[0].x
+                and cluster.lista_posizioni[0].y == cl.lista_posizioni[0].y ):
+            print(str(cluster.lista_posizioni[0].x)+ " "+str(cluster.lista_posizioni[0].y))
+            contatore += 1
+
+    return contatore
 
 
 def ContaDecisioni(arrayContatori,listaSegmentiReali, listaCluster):
     print(len(listaSegmentiReali))
     print(len(listaCluster))
 
+    listaClusterNuova=list()
+    for cluster in listaCluster:
+        if(Metodo(listaCluster,cluster)==1):
+            listaClusterNuova.append(cluster)
+
+    for cluster in listaClusterNuova:
+        print("\n")
+
+        for pos in cluster.lista_posizioni:
+            print(str(pos.x) + " " + str(pos.y) + " fr")
 
     for l in listaSegmentiReali:
         print("\n")
 
-        for pos in l:
-            print(str(pos.x) + " " + str(pos.y)+" r")
-    if(len(listaCluster)>len(listaSegmentiReali)):
-        listaClusterNuova=list()
-        while(len(listaClusterNuova)!=len(listaSegmentiReali)):
-            for listReal in listaSegmentiReali:
-                for cluster in listaCluster:
+        for p in l:
+            print(str(p.x) + " " + str(p.y)+" r")
 
-                    if (listReal[len(listReal)-1].x == cluster.lista_posizioni[len(cluster.lista_posizioni)-1].x and listReal[len(listReal)-1].y == cluster.lista_posizioni[len(cluster.lista_posizioni)-1].y):
-                        listaClusterNuova.append(cluster)
-        for cluster in listaClusterNuova:
-            print("\n")
 
-            for pos in cluster.lista_posizioni:
-                print(str(pos.x) + " " + str(pos.y) + " fr")
-        for listReal in listaSegmentiReali:
-            for cluster in listaClusterNuova:
+    for listReal in listaSegmentiReali:
+            if(MioMetodo(listReal,listaClusterNuova)==True):
+                arrayContatori[0] += 1
+            else:
+                arrayContatori[1] += 1
 
-                if (listReal[0].x == cluster.lista_posizioni[0].x and listReal[0].y == cluster.lista_posizioni[0].y):
-                    if (traiettoriaCoincidente(listReal, cluster.lista_posizioni) == True):
+    arrayContatori[2] += 1
+    return arrayContatori
 
-                        arrayContatori[0] += 1
-
-                    else:
-
-                        arrayContatori[1] += 1
-
-        return arrayContatori
-    else:
-        for cluster in listaCluster:
-            print("\n")
-
-            for pos in cluster.lista_posizioni:
-                print(str(pos.x) + " " + str(pos.y) + " fr")
-        for listReal in listaSegmentiReali:
-            for cluster in listaCluster:
-
-                if(listReal[0].x==cluster.lista_posizioni[0].x and listReal[0].y==cluster.lista_posizioni[0].y):
-                    if(traiettoriaCoincidente(listReal, cluster.lista_posizioni)==True):
-
-                        arrayContatori[0] +=1
-
-                    else:
-
-                        arrayContatori[1] += 1
-
-        return arrayContatori
 
 
 
@@ -148,19 +146,19 @@ def getPosizioniReali(cursor, incrocio,tipo, id_log):
 
     t3 += timedelta(milliseconds=200)
     tm3 = t3.strftime("%H:%M:%S.%f")[:-3]
-
+    '''
     print("TEMPO "+tm1)
     print("TEMPO "+tm2)
 
     print("TEMPO "+incrocio.timestamp)
     print("TEMPO "+tm3)
-
+    '''
 
     array=cursor.execute("SELECT valore_segmento.posizione, valore_segmento.id_segmento FROM valore INNER JOIN valore_segmento ON valore_segmento.id_valore = valore.id_valore WHERE valore.timestamp_pos = ? OR valore.timestamp_pos = ? OR  valore.timestamp_pos = ? OR  valore.timestamp_pos = ? AND  valore_segmento.id_segmento = ? ;" ,(tm1,incrocio.timestamp, tm2,tm3,id_log,)  ).fetchall()
 
     for row in array:
         if(row[1]==id_log):
-            print(row)
+            #print(row)
             s = row[0].strip('\n').split(' ')
 
             pos=Position()
@@ -168,7 +166,7 @@ def getPosizioniReali(cursor, incrocio,tipo, id_log):
             pos.x=float(s[0].replace(',','.'))
             pos.y=float(s[1].replace(',','.'))
 
-            if(GetDistanza(pos,incrocio.position)<100):
+            if(GetDistanza(pos,incrocio.position)<50):
                 #print(str(incrocio.position.x) + " " + str(incrocio.position.y)+" "+incrocio.timestamp + " inc")
 
                 #print(str(pos.x) + " " + str(pos.y) + " pos_suc" + tipo)
@@ -267,9 +265,13 @@ def test_kalmanfilter(decisioniTotali,lista_incroci,pathDirectoryLog):
 
     decisioniGiuste=0
     decisioniSbagliate=0
+    contatoreIncroci=0
+
     arrayContatori=[]
     arrayContatori.append(decisioniGiuste)
     arrayContatori.append(decisioniSbagliate)
+    arrayContatori.append(contatoreIncroci)
+
     flag=False
     listaDuplicati=None
     count=0
@@ -292,11 +294,13 @@ def test_kalmanfilter(decisioniTotali,lista_incroci,pathDirectoryLog):
 
             flag=False
         print(len( inc.listaCluster))
+        print(str(len(listaSegmentiReali))+" "+str("pro"))
+        print(inc.timestamp)
 
         arrayContatori=ContaDecisioni(arrayContatori,listaSegmentiReali, inc.listaCluster)
         listaSegmentiReali.clear()
 
-    print(str(len(lista_incroci))+" incroci")
+    print(str(arrayContatori[2])+" incroci")
 
     print(str(arrayContatori[0])+" giuste")
     print(str(arrayContatori[1])+" sbagliate")

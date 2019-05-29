@@ -83,7 +83,7 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                 distanza = GetDistanza(pos, p)
                 timestampPos2 = parsedline[0]
 
-                if (distanza <= 15 and timestm!=timestampPos2):
+                if (distanza <= 200 and timestm!=timestampPos2):
                     listasegmenti[i].append(linea)
                     return
 
@@ -104,7 +104,7 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                     distanza = GetDistanza(pos, e)
                     timestampPos2 = parsedline[0]
 
-                    if (distanza <= 15 and timestampPos2!=timestamp):
+                    if (distanza <= 200 and timestampPos2!=timestamp):
                         listasegmenti[i].append(timestamp+" "+str(e.x)+" "+str(e.y))
                         continue
 
@@ -122,11 +122,11 @@ def LeggiParallelismi(listasegmenti, f, timestamp,ind,linea):
                 p.y = float(parsedline[2].replace(',', '.'))
                 distanza = GetDistanza(p, nondup)
                 timestampPos = parsedline[0]
-                if(distanza<=15 and timestamp!=timestampPos):
+                if(distanza<=200 and timestamp!=timestampPos):
                     listasegmenti[i].append(timestamp + " " + str(nondup.x) + " " + str(nondup.y))
                     continue
         t = datetime.strptime(timestamp, ("%H:%M:%S.%f"))
-        t += timedelta(milliseconds=200)
+        t += timedelta(milliseconds=1000)
         tm = t.strftime("%H:%M:%S.%f")[:-3]
         timestamp=tm
         duplicates = []
@@ -206,7 +206,7 @@ def GetDistanzaMinima(lista_segmenti, pos):
         ps.x = float(parsedline[1].replace(',', '.'))
         ps.y = float(parsedline[2].replace(',', '.'))
         d2=GetDistanza(ps, pos)
-        if(d2<15 or distanza<15):
+        if(d2<200 or distanza<200):
             continue
         if(d2<distanza ):
             p=ps
@@ -282,7 +282,7 @@ def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters,linea, lis
                     distanza = GetDistanza(pos1, pos2)
                     timestampPos2 = parsedline[0]
 
-                    if (distanza <= 15 and timestampPos1 != timestampPos2):  ##qua trova l'incrocio
+                    if (distanza <= 200 and timestampPos1 != timestampPos2):  ##qua trova l'incrocio
                         listasegmenti[i].append(linea)
                         continue
 
@@ -297,7 +297,7 @@ def GetPuntiDopoIncrocio(puntoincrocio,tmincrocio, f,j,lista_clusters,linea, lis
         distanza = GetDistanza(pos, puntoincrocio)
 
         timestampPos = parsedline[0]
-        if (distanza <= 15 and timestampPos != tmincrocio ):
+        if (distanza <= 200 and timestampPos != tmincrocio ):
 
             listaPunti.append(pos)
 
@@ -380,7 +380,7 @@ def RecontructPathLogs(pathDirectoryLog):
             p1.x =float(parsedline2[1].replace(',','.'))
             p1.y =float(parsedline2[2].replace(',','.'))
             distanza=GetDistanza(p0,p1)
-            if(distanza>15):
+            if(distanza>200):
                 lista0=list()
                 lista1=list()
                 lista0.append(linea1)
@@ -466,7 +466,7 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
 
-            if(distanza<=15 and timestampPos!=timestamp ):
+            if(distanza<=200 and timestampPos!=timestamp ):
 
                 if(incrocio):
 
@@ -516,7 +516,7 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
                 t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
-                t += timedelta(milliseconds=200)
+                t += timedelta(milliseconds=1000)
                 timest = t.strftime("%H:%M:%S.%f")[:-3]
                 if(duplicates):
                     for nodup in noduplicates:
@@ -531,7 +531,7 @@ def RecontructPathLogs(pathDirectoryLog):
                             pos.y = float(parsedline[2].replace(',', '.'))
                             distanza = GetDistanza(nodup, pos)
                             timestampPos = parsedline[0]
-                            if(distanza<=15 and timest!=timestampPos):
+                            if(distanza<=200 and timest!=timestampPos):
                                 listasegmenti[r].append(timest+" "+str(nodup.x)+" "+str(nodup.y))
                                 continue
 
@@ -563,7 +563,7 @@ def RecontructPathLogs(pathDirectoryLog):
                         if (isContainedDuplicati(duplicates, pMin.position) > 1):
                                 flagParallelismo = True
                                 t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
-                                t += timedelta(milliseconds=200)
+                                t += timedelta(milliseconds=1000)
                                 listasegmenti[pMin.id_segment].append("fine_segmento")
                                 segnuovo = list()
                                 lastTM=t.strftime("%H:%M:%S.%f")[:-3]
@@ -579,7 +579,7 @@ def RecontructPathLogs(pathDirectoryLog):
 
 
                         t = datetime.strptime(timestampIncrocio, ("%H:%M:%S.%f"))
-                        t += timedelta(milliseconds=200)
+                        t += timedelta(milliseconds=1000)
                         ##qui sotto assegno il feature vector al segmento giusto
                         if (listasegmenti[pMin.id_segment][len(listasegmenti[pMin.id_segment]) - 1] != "fine_segmento"):
                             listasegmenti[pMin.id_segment].append(
@@ -631,7 +631,7 @@ def RecontructPathLogs(pathDirectoryLog):
 
                 if(len(duplicates)!=0):
                     t = datetime.strptime(lastTM, ("%H:%M:%S.%f"))
-                    t += timedelta(milliseconds=200)
+                    t += timedelta(milliseconds=1000)
                     lastTM = t.strftime("%H:%M:%S.%f")[:-3]
                     linea=f.readline()
 
@@ -655,7 +655,7 @@ def RecontructPathLogs(pathDirectoryLog):
                             distanza = GetDistanza(p, pos)
                             timestampPos = parsedline[0]
 
-                            if (distanza <= 15 and timestamp != timestampPos):
+                            if (distanza <= 200 and timestamp != timestampPos):
                                 listasegmenti[i].append(linea)
 
                         linea=f.readline()

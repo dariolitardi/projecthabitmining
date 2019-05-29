@@ -91,7 +91,7 @@ def ContaDecisioni(arrayContatori,listaSegmentiReali, listaCluster):
         if(Metodo(listaCluster,cluster)==1):
             listaClusterNuova.append(cluster)
 
-    for cluster in listaClusterNuova:
+    for cluster in listaCluster:
         print("\n")
 
         for pos in cluster.lista_posizioni:
@@ -105,7 +105,7 @@ def ContaDecisioni(arrayContatori,listaSegmentiReali, listaCluster):
 
 
     for listReal in listaSegmentiReali:
-            if(MioMetodo(listReal,listaClusterNuova)==True):
+            if(MioMetodo(listReal,listaCluster)==True):
                 arrayContatori[0] += 1
             else:
                 arrayContatori[1] += 1
@@ -135,16 +135,16 @@ def getPosizioniReali(cursor, incrocio,tipo, id_log):
 
 
     t1 = datetime.strptime(incrocio.timestamp, ("%H:%M:%S.%f"))
-    t1 -= timedelta(milliseconds=400)
+    t1 -= timedelta(milliseconds=2000)
     tm1 = t1.strftime("%H:%M:%S.%f")[:-3]
 
     t2 = datetime.strptime(incrocio.timestamp, ("%H:%M:%S.%f"))
-    t2 -= timedelta(milliseconds=200)
+    t2 -= timedelta(milliseconds=1000)
     tm2=t2.strftime("%H:%M:%S.%f")[:-3]
 
     t3 = datetime.strptime(incrocio.timestamp, ("%H:%M:%S.%f"))
 
-    t3 += timedelta(milliseconds=200)
+    t3 += timedelta(milliseconds=1000)
     tm3 = t3.strftime("%H:%M:%S.%f")[:-3]
     '''
     print("TEMPO "+tm1)

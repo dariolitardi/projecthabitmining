@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Project was exported from assembly: C:\Users\Dario\Desktop\HomeSensorSimulator\HomeSensorSimulator\HomeDesigner.exe-->
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{85945B3E-453D-4AF9-B000-413FD55A0EBA}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>HomeDesigner</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <FileAlignment>512</FileAlignment>
+    <RootNamespace>HomeDesigner</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Devart.Data, Version=5.0.2070.0, Culture=neutral, PublicKeyToken=09af7300eec23701">
+      <HintPath>..\..\..\..\Program Files (x86)\Devart\dotConnect\SQLite\Devart.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Devart.Data.SQLite, Version=5.11.1278.0, Culture=neutral, PublicKeyToken=09af7300eec23701">
+      <HintPath>..\..\..\..\Program Files (x86)\Devart\dotConnect\SQLite\Devart.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="Devart.Data.SQLite.Design, Version=5.11.1278.0, Culture=neutral, PublicKeyToken=09af7300eec23701">
+      <HintPath>..\..\..\..\Program Files (x86)\Devart\dotConnect\SQLite\Devart.Data.SQLite.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Devart.Data.SQLite.Vs, Version=5.11.1278.0, Culture=neutral, PublicKeyToken=09af7300eec23701">
+      <HintPath>..\..\..\..\Program Files (x86)\Devart\dotConnect\SQLite\Devart.Data.SQLite.Vs.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System" />
+    <Reference Include="Simulator">
+      <HintPath>lib\Simulator.exe</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Workflow.Runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Form1.cs" />
+    <Compile Include="FormInfo.cs" />
+    <Compile Include="FormSimulation.cs" />
+    <Compile Include="Graph.cs" />
+    <Compile Include="Printer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Data.cs" />
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

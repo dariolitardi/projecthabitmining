@@ -21,7 +21,7 @@ p13 1400 750
 p14 1400 1350
 p11 1400 500
 p19 1400 150
-bathroom_sink 1600 450
+bathroom_sink 1700 450
 bed 1650 1250
 computer_chair 1650 900
 computer 1650 850
@@ -38,14 +38,14 @@ tv_chair 150 400
 wardrobe 1900 1050
 wc 1500 250
 bathtub 1850 250
-oven 1200 850
-kitchen_shelf 1300 1150
-shoe_shelf 1200 250
+oven 1250 850
+kitchen_shelf 1300 1200
+shoe_shelf 1250 250
 exercise_place 150 1250
-chair 850 950
-tv_kitchen 650 950
-library 1550 700
-dishwasher 1300 950
+chair 900 1000
+tv_kitchen 700 900
+library 1500 550
+dishwasher 1300 900
 washing_machine 1700 200
 cookers 1050 850
 closet 1950 650
@@ -53,7 +53,19 @@ sofa 400 400
 shower_stall 1450 400
 coat_hangers 650 400
 table 850 1050
-p23 950 450
+p9 500 600
+p21 550 600
+p23 600 600
+p26 650 600
+p27 700 600
+p28 750 600
+p29 800 600
+p30 850 600
+p31 900 600
+p32 950 600
+p33 1000 600
+p34 850 350
+
 
 Walls
 p1 p2
@@ -77,4 +89,64 @@ p1 p5
 p20 p25
 
 Sensors
+e1 700 250 0 type1
+e2 900 250 0 type1
+e3 1100 250 0 type1
+e4 1300 250 0 type1
+dr1 150 250 0 type1
+dr2 350 250 0 type1
+dr3 550 250 0 type1
+dr4 150 450 0 type1
+dr5 350 450 0 type1
+dr6 550 450 0 type1
+dr7 150 650 0 type1
+dr8 350 650 0 type1
+dr9 550 650 0 type1
+dr10 150 850 0 type1
+k1 700 850 0 type1
+k2 900 850 0 type1
+k3 1100 850 0 type1
+k4 1300 850 0 type1
+k5 700 1050 0 type1
+k6 900 1050 0 type1
+c1 1500 600 0 type1
+c2 1700 600 0 type1
+c3 1900 600 0 type1
+bt1 1900 400 0 type1
+bt2 1700 400 0 type1
+bt3 1500 400 0 type1
+bt4 1500 200 0 type1
+bt5 1700 200 0 type1
+bt6 1900 200 0 type1
+bd1 1900 850 0 type1
+bd2 1700 850 0 type1
+bd3 1500 850 0 type1
+bd4 1500 1050 0 type1
+bd5 1700 1050 0 type1
+bd6 1900 1050 0 type1
+bd7 1500 1250 0 type1
+bd8 1700 1250 0 type1
+bd9 1900 1250 0 type1
+e5 700 450 0 type1
+e6 900 450 0 type1
+e7 1100 450 0 type1
+e8 1300 450 0 type1
+e9 700 650 0 type1
+e10 900 650 0 type1
+e11 1100 650 0 type1
+e12 1300 650 0 type1
+dr11 350 850 0 type1
+dr12 550 850 0 type1
+dr13 150 1050 0 type1
+dr14 350 1050 0 type1
+dr15 550 1050 0 type1
+dr16 150 1250 0 type1
+dr17 350 1250 0 type1
+dr18 550 1250 0 type1
+k7 1100 1050 0 type1
+k8 1300 1050 0 type1
+k9 700 1250 0 type1
+k10 900 1250 0 type1
+k11 1100 1250 0 type1
+k12 1300 1250 0 type1
 

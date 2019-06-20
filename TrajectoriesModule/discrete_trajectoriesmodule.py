@@ -141,7 +141,6 @@ def main():
         ##file tsminimo leggo una nuova linea e lo schiaffo in listapuntatorilinee
 
         parsedline=listafile[idfiletsminimo].readline().split("\t")
-
         line=parsedline[0]+" "+parsedline[1]
 
         if(line=="" and len(listapuntatorilinee)!=0):

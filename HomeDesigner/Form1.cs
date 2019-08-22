@@ -10,23 +10,26 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-
 using System;
 using System.Text;
 
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
+using System.Globalization;
+using System.Linq;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using Devart.Data.SQLite;
 using Devart.Data;
 
 namespace HomeDesigner
 {
-  public class Form1 : Form
-  {
+  public class Form1 : Form{
+
     private IContainer components = (IContainer) null;
     private PictureBox pictureBox1;
     private Label label1;
@@ -41,11 +44,16 @@ namespace HomeDesigner
     private Button predizioneStop;
     private Label labelSim;
     private Label labelPred;
-    private Task task;
+    private CheckBox adjustCheckBox;
+
+    private Button pausePredizioneButton;
+    private Button pauseSimulazioneButton;
+
     private Button simula;
+    private Button zoom;
+    private Button zoomMeno;
     private Button disegnaPredizione;
     private Button doEdits;
-    private CheckBox adjustCheckBox;
     private CheckBox sensorCheckBox;
     private TextBox orientationtb;
     private TextBox sensortypetb;
@@ -67,16 +75,19 @@ namespace HomeDesigner
     private ToolTip toolTip1;
     private Label label8;
     private Button button1;
+    private static bool isLoaded;
+    private Task taskSimulazione;
+    private Task taskPredizione;
+    public float zoomFactor;
     private Label label9;
     private Label simulationLabel;
     private Label designLabel;
+    private CheckBox showSensors;
 
     private Label label10;
     private ComboBox posNamecb;
     private Label simulationBox;
-    private ComboBox numeroPersoneBox;
-    private ComboBox intervalloBox;
-
+    public static Bitmap bitmapHouse;
     private HomeDesigner.Data data;
 
     protected override void Dispose(bool disposing)
@@ -88,6 +99,8 @@ namespace HomeDesigner
 
     private void InitializeComponent()
     {
+    
+      this.WindowState = FormWindowState.Maximized;
       this.components = (IContainer) new Container();
       ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof (Form1));
       this.label1 = new Label();
@@ -101,8 +114,13 @@ namespace HomeDesigner
       this.disegnaPredizione = new Button();
       this.disegnaStop = new Button();
       this.predizioneStop = new Button();
-
+      this.pausePredizioneButton= new Button();
+      this.pauseSimulazioneButton= new Button();
       this.simula = new Button();
+      this.zoom = new Button();
+      this.zoomMeno = new Button();
+      this.showSensors = new CheckBox();
+
       this.labelSim=new Label();
       this.labelPred=new Label();
 
@@ -137,8 +155,6 @@ namespace HomeDesigner
       this.label10 = new Label();
       this.posNamecb = new ComboBox();
       this.simulationBox = new Label();
-      this.numeroPersoneBox = new ComboBox();
-      this.intervalloBox = new ComboBox();
 
       ((ISupportInitialize) this.pictureBox1).BeginInit();
       this.groupBox1.SuspendLayout();
@@ -196,36 +212,76 @@ namespace HomeDesigner
       this.save.Text = "Save";
       this.save.UseVisualStyleBackColor = true;
       this.save.Click += new EventHandler(this.button1_Click);
-      this.disegna.Location = new Point(600, 42);
+      
+      this.showSensors.Location = new Point(1170, 15);
+      this.showSensors.Name = "showsensors";
+      this.showSensors.Size = new Size(100, 50);
+      this.showSensors.TabIndex = 5;
+      this.showSensors.Text = "show sensors";
+      this.showSensors.UseVisualStyleBackColor = true;
+      this.showSensors.CheckedChanged += new EventHandler(this.checkBox1_ShowSensors);      
+      this.disegna.Location = new Point(540, 38);
       this.disegna.Name = "disegna";
-      this.disegna.Size = new Size(33, 31);
+      this.disegna.Size = new Size(48, 48);
       this.disegna.TabIndex = 5;
       this.disegna.UseVisualStyleBackColor = true;
       this.disegna.Image = System.Drawing.Image.FromFile("Resources/play_image.PNG");
-
+      GraphicsPath graphicsPathDisegna = new GraphicsPath();
+      graphicsPathDisegna.AddEllipse(1, 1, disegna.Width - 4, disegna.Height - 4);
+      disegna.Region = new Region(graphicsPathDisegna);
       this.disegna.Click += new EventHandler(this.buttonDisegna_Click);
-      this.disegnaStop.Location = new Point(640, 42);
+      this.disegnaStop.Location = new Point(590, 40);
       this.disegna.Name = "disegnaStop";
-      this.disegnaStop.Size = new Size(33, 31);
+      this.disegnaStop.Size = new Size(47, 47);
       this.disegnaStop.TabIndex = 5;
       this.disegnaStop.UseVisualStyleBackColor = true;
       this.disegnaStop.Image = System.Drawing.Image.FromFile("Resources/stop_image.PNG");
-
-      this.disegnaStop.Click += new EventHandler(this.button2_Click);
-      this.predizioneStop.Location = new Point(730, 42);
-      this.predizioneStop.Name = "disegnaStop";
-      this.predizioneStop.Size = new Size(33, 31);
+      GraphicsPath gp = new GraphicsPath();
+      gp.AddEllipse(1, 1, disegnaStop.Width - 4, disegnaStop.Height - 4);
+      disegnaStop.Region = new Region(gp);
+      this.disegnaStop.Click += new EventHandler(this.buttonStopSimulazione);
+      
+      this.pauseSimulazioneButton.Location = new Point(640, 40);
+      this.pauseSimulazioneButton.Name = "pauseSimulazione";
+      this.pauseSimulazioneButton.Size = new Size(47, 47);
+      this.pauseSimulazioneButton.TabIndex = 5;
+      this.pauseSimulazioneButton.UseVisualStyleBackColor = true;
+      this.pauseSimulazioneButton.Image = System.Drawing.Image.FromFile("Resources/pause_image.PNG");
+      GraphicsPath gpause = new GraphicsPath();
+      gpause.AddEllipse(1, 1, pauseSimulazioneButton.Width - 4, pauseSimulazioneButton.Height - 4);
+      pauseSimulazioneButton.Region = new Region(gpause);
+      this.pauseSimulazioneButton.Click += new EventHandler(this.buttonPauseSimulazione);
+      
+      this.pausePredizioneButton.Location = new Point(788, 38);
+      this.pausePredizioneButton.Name = "pausePredizioneButton";
+      this.pausePredizioneButton.Size = new Size(47, 47);
+      this.pausePredizioneButton.TabIndex = 5;
+      this.pausePredizioneButton.UseVisualStyleBackColor = true;
+      this.pausePredizioneButton.Image = System.Drawing.Image.FromFile("Resources/pause_image.PNG");
+      GraphicsPath gpausePred = new GraphicsPath();
+      gpausePred.AddEllipse(1, 1, pausePredizioneButton.Width - 4, pausePredizioneButton.Height - 4);
+      pausePredizioneButton.Region = new Region(gpausePred);
+      this.pausePredizioneButton.Click += new EventHandler(this.buttonPausePredizione);
+      
+      this.predizioneStop.Location = new Point(738, 40);
+      this.predizioneStop.Name = "predizioneStop";
+      this.predizioneStop.Size = new Size(47, 47);
       this.predizioneStop.TabIndex = 5;
       this.predizioneStop.UseVisualStyleBackColor = true;
       this.predizioneStop.Image = System.Drawing.Image.FromFile("Resources/stop_image.PNG");
-
-      this.predizioneStop.Click += new EventHandler(this.button2_Click);
-      this.disegnaPredizione.Location = new Point(690, 42);
+      GraphicsPath gp2 = new GraphicsPath();
+      gp2.AddEllipse(1, 1, predizioneStop.Width - 4, predizioneStop.Height - 4);
+      predizioneStop.Region = new Region(gp2);
+      this.predizioneStop.Click += new EventHandler(this.buttonStopPredizione);
+      this.disegnaPredizione.Location = new Point(690, 40);
       this.disegnaPredizione.Name = "disegnaPredizione";
-      this.disegnaPredizione.Size = new Size(30, 31);
+      this.disegnaPredizione.Size = new Size(48, 48);
       this.disegnaPredizione.TabIndex = 5;
       this.disegnaPredizione.Image = System.Drawing.Image.FromFile("Resources/play_image.PNG");
       this.disegnaPredizione.UseVisualStyleBackColor = true;
+      GraphicsPath graphicsPathDisegnaPredizione = new GraphicsPath();
+      graphicsPathDisegnaPredizione.AddEllipse(1, 1, disegnaPredizione.Width - 4, disegnaPredizione.Height - 4);
+      disegnaPredizione.Region = new Region(graphicsPathDisegnaPredizione);
       this.disegnaPredizione.Click += new EventHandler(this.buttonDisegnaPredizione_Click);
       
       this.simula.Location = new Point(450, 45);
@@ -235,7 +291,27 @@ namespace HomeDesigner
       this.simula.Text = "Simulate";
       this.simula.UseVisualStyleBackColor = true;
       this.simula.Click += new EventHandler(this.buttonSimula_Click);
-      
+      this.zoom.Location = new Point(1000, 10);
+      this.zoom.Name = "zoomButton";
+      this.zoom.Size = new Size(50, 50);
+      this.zoom.TabIndex = 5;
+      this.zoom.Image = System.Drawing.Image.FromFile("Resources/zoompiu.PNG");
+      GraphicsPath p = new GraphicsPath();
+      p.AddEllipse(1, 1, zoom.Width - 4, zoom.Height - 4);
+      zoom.Region = new Region(p);
+      this.zoom.UseVisualStyleBackColor = true;
+      this.zoom.Click += new EventHandler(this.zoomButton_Click);
+      this.zoomMeno.Location = new Point(1080, 10);
+      this.zoomMeno.Name = "zoomButtonMeno";
+     
+      this.zoomMeno.Size = new Size(50, 50);
+      this.zoomMeno.TabIndex = 5;
+      this.zoomMeno.UseVisualStyleBackColor = true;
+      this.zoomMeno.Image = System.Drawing.Image.FromFile("Resources/zoomout.PNG");
+      GraphicsPath p1 = new GraphicsPath();
+      p1.AddEllipse(1, 1, zoomMeno.Width - 4, zoomMeno.Height - 4);
+      zoomMeno.Region = new Region(p1);
+      this.zoomMeno.Click += new EventHandler(this.zoomMenoButton_Click);
       this.doEdits.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
       this.doEdits.Location = new Point(588, 588);
       this.doEdits.Name = "doEdits";
@@ -263,6 +339,7 @@ namespace HomeDesigner
       this.adjustCheckBox.TabIndex = 13;
       this.adjustCheckBox.Text = "adjust new points";
       this.adjustCheckBox.UseVisualStyleBackColor = true;
+      
       this.sensorCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
       this.sensorCheckBox.AutoSize = true;
       this.sensorCheckBox.Location = new Point(732, 64);
@@ -475,28 +552,14 @@ namespace HomeDesigner
       this.posNamecb.TabIndex = 30;
       this.posNamecb.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
       
-      this.numeroPersoneBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      this.numeroPersoneBox.FormattingEnabled = true;
-      this.numeroPersoneBox.Location = new Point(50, 20);
-      this.numeroPersoneBox.Name = "numeroPersoneBox";
-      this.numeroPersoneBox.Size = new Size(121, 21);
-      this.numeroPersoneBox.TabIndex = 30;
-      this.numeroPersoneBox.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
-      this.intervalloBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-      this.intervalloBox.FormattingEnabled = true;
-      this.intervalloBox.Location = new Point(470, 9);
-      this.intervalloBox.Name = "intervalloBox";
-      this.intervalloBox.Size = new Size(121, 21);
-      this.intervalloBox.TabIndex = 30;
-      this.intervalloBox.SelectedIndexChanged += new EventHandler(this.cb1_SelectedIndexChanged);
+  
+     
       this.AutoScaleDimensions = new SizeF(6f, 13f);
       this.AutoScaleMode = AutoScaleMode.Font;
       this.AutoScroll = true;
       this.ClientSize = new Size(891, 651);
       this.Controls.Add((Control) this.posNamecb);
       this.Controls.Add((Control) this.simulationBox);
-      this.Controls.Add((Control) this.numeroPersoneBox);
-      this.Controls.Add((Control) this.intervalloBox);
 
       this.Controls.Add((Control) this.label10);
       this.Controls.Add((Control) this.label9);
@@ -511,6 +574,11 @@ namespace HomeDesigner
       this.Controls.Add((Control) this.groupBox2);
       this.Controls.Add((Control) this.sensortb);
       this.Controls.Add((Control) this.label7);
+      this.Controls.Add((Control) this.zoom);
+      this.Controls.Add((Control) this.zoomMeno);
+      this.Controls.Add((Control) this.pauseSimulazioneButton);
+      this.Controls.Add((Control) this.pausePredizioneButton);
+
       this.Controls.Add((Control) this.groupBox1);
       this.Controls.Add((Control) this.sensorCheckBox);
       this.Controls.Add((Control) this.adjustCheckBox);
@@ -526,6 +594,7 @@ namespace HomeDesigner
       this.Controls.Add((Control) this.labelSim);
 
       this.Controls.Add((Control) this.labelPred);
+      this.Controls.Add((Control) this.showSensors);
 
       this.Controls.Add((Control) this.simula);
 
@@ -553,6 +622,7 @@ namespace HomeDesigner
     public Form1()
     {
       this.InitializeComponent();
+      this.zoomFactor = 1;
       this.data = new HomeDesigner.Data();
       this.reloadcbs();
       string[] strArray = File.ReadAllText("Data/House_models/obligatory_places.txt").Split(new char[4]
@@ -572,32 +642,8 @@ namespace HomeDesigner
       // Get all subdirectories
 
       string[] subdirectoryEntries = Directory.GetDirectories(root);
-      this.numeroPersoneBox.Items.Add((object) "[number_of_persons]");
-
-      this.numeroPersoneBox.Items.Add((object) "1");
-      this.numeroPersoneBox.Items.Add((object) "2");
-      this.numeroPersoneBox.Items.Add((object) "3");
-      this.numeroPersoneBox.Items.Add((object) "4");
-      this.numeroPersoneBox.SelectedItem = (object) "[number_of_persons]";
-      
-      this.intervalloBox.Items.Add((object) "[interval_of_time]");
-
-      this.intervalloBox.Items.Add((object) "00:00:00-02:00:00");
-      this.intervalloBox.Items.Add((object) "02:00:01-04:00:00");
-      this.intervalloBox.Items.Add((object) "04:00:01-06:00:00");
-      this.intervalloBox.Items.Add((object) "06:00:01-08:00:00");
-      this.intervalloBox.Items.Add((object) "08:00:01-10:00:00");
-      this.intervalloBox.Items.Add((object) "10:00:01-12:00:00");
-      this.intervalloBox.Items.Add((object) "12:00:01-14:00:00");
-      this.intervalloBox.Items.Add((object) "14:00:01-16:00:00");
-      this.intervalloBox.Items.Add((object) "16:00:01-18:00:00");
-      this.intervalloBox.Items.Add((object) "18:00:01-20:00:00");
-      this.intervalloBox.Items.Add((object) "20:00:01-22:00:00");
-      this.intervalloBox.Items.Add((object) "22:00:01-23:50:00");
-
-
-  
-      this.intervalloBox.SelectedItem = (object)"[interval_of_time]";
+     
+     
 
 
    
@@ -626,9 +672,66 @@ namespace HomeDesigner
       }
       this.savecb.SelectedIndex = -1;
     }
-   
+
+    public static bool stopSimulazione;
+    public static bool pauseSimulazione;
+    public static bool restartSimulazione;
+    public static bool pausePredizione;
+    public static bool restartPredizione;
+    private   void buttonStopSimulazione(object sender, EventArgs e)
+    {
+      
+      stopSimulazione = true;
+
+
+
+    }
+    private   void buttonPausePredizione(object sender, EventArgs e)
+    {
+      if (!pausePredizione)
+      {
+
+        pausePredizione = true;
+        restartPredizione = false;
+      }
+      else
+      {
+
+        pausePredizione = false;
+        restartPredizione = true;
+      }
+
+
+    }
+    private   void buttonPauseSimulazione(object sender, EventArgs e)
+    {
+      if (!pauseSimulazione)
+      {
+
+        pauseSimulazione = true;
+        restartSimulazione = false;
+      }
+      else
+      {
+
+        pauseSimulazione = false;
+        restartSimulazione = true;
+      }
+
+
+    }
+    public static bool stopPredizione;
+    private   void buttonStopPredizione(object sender, EventArgs e)
+    {
+      
+      stopPredizione = true;
+
+
+
+    }
     private void button2_Click(object sender, EventArgs e)
     {
+      isLoaded = true;
       this.data.loadHouse(this.loadcb.Text);
       this.savecb.SelectedIndex = this.loadcb.SelectedIndex;
       this.refresh();
@@ -757,42 +860,98 @@ namespace HomeDesigner
         });
       }
     }
- 
+
     public void refreshSimulazione()
     {
       
       string folderPath = "";
        FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
        folderBrowserDialog1.SelectedPath = "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log";
-       if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+      String intervallo;
+      if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+        FormInfo forminfo=new FormInfo();
+        forminfo.ShowDialog();
+         intervallo=forminfo.SelectedInterval;
+         if (intervallo.Equals("[interval_of_time]"))
+         {
+           MessageBox.Show("Before the plotting of the simulation, choose an interval of time to draw!");
+            return;
+         }
+         
          folderPath = folderBrowserDialog1.SelectedPath ;
+         if (!folderPath.Contains("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim"))
+         {
+           MessageBox.Show("You must choose a valid simulation path!");
+
+           return;
+         }
          simulationBox.Text = " ";
 
          simulationBox.Text+=" "+ folderPath.Substring(50);
          folderBrowserDialog1.Dispose();
          folderBrowserDialog1.Reset();
        }
-      
-      
-      this.posTextBox.Text = Printer.printPos(this.data.pos);
-      this.wallTextBox.Text = Printer.printWall(this.data.wall);
-      this.sensortb.Text = Printer.printSensor(this.data.sensor);
-       task = Task.Run( () => this.pictureBox1.Image = (Image) this.data.drawSimulate(folderPath, this.pictureBox1,this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked));
-    
-       }
-   
-    public void refreshPrediction( Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary)
-    {
-   
+      else
+      {
+        return;
+      }
+     String t0= intervallo.Split('-')[0];
+      var now = DateTime.Now;
+      int hours = Convert.ToInt32(t0.Split(':')[0]);
+      int min = Convert.ToInt32(t0.Split(':')[1]);
+      int sec = Convert.ToInt32(t0.Split(':')[2]);
+
+  
+      DateTime timeInizio= new DateTime(now.Year, now.Month, now.Day,hours,min,sec);
+      String t1= intervallo.Split('-')[1];
+       hours = Convert.ToInt32(t1.Split(':')[0]);
+       min = Convert.ToInt32(t1.Split(':')[1]);
+       sec = Convert.ToInt32(t1.Split(':')[2]);
+      DateTime timeFine=      new DateTime(now.Year, now.Month, now.Day,hours,min,sec);
 
       this.posTextBox.Text = Printer.printPos(this.data.pos);
       this.wallTextBox.Text = Printer.printWall(this.data.wall);
       this.sensortb.Text = Printer.printSensor(this.data.sensor);
-      Task task = Task.Run( () => this.pictureBox1.Image = (Image) this.data.drawPrediction( this.pictureBox1,dictionary,this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked));
+     
+     
+      stopSimulazione = false;
+      pauseSimulazione = false;
+      Task task = Task.Run( () => this.pictureBox1.Image = (Image)this.data.DrawSimulation(this, folderPath,
+          this.pictureBox1, this.placepcb.Checked, false,
+          this.wallpcb.Checked, timeInizio, timeFine, this.zoomFactor));
       if (task.IsCompleted)
       {
-        dictionary.Clear();
+        task.Dispose();
+        task = null;
       }
+        
+        
+    
+
+
+    }
+   
+    public void refreshPrediction( Dictionary<string, List<KeyValuePair<Position,Color>>> dictionary, DateTime timeInizio, DateTime timeFine )
+    {
+     
+        this.posTextBox.Text = Printer.printPos(this.data.pos);
+        this.wallTextBox.Text = Printer.printWall(this.data.wall);
+        this.sensortb.Text = Printer.printSensor(this.data.sensor);
+            string folderPath = "";
+
+            stopPredizione = false;
+         Task task = Task.Run( () => this.pictureBox1.Image = (Image) this.data.DrawSimulation(this, folderPath,
+          this.pictureBox1, this.placepcb.Checked,false,
+          this.wallpcb.Checked, timeInizio, timeFine, this.zoomFactor));
+            if (task.IsCompleted)
+        {
+          dictionary.Clear();
+          task.Dispose();
+          task = null;
+        }
+
+
+      
 
     }
 
@@ -801,7 +960,9 @@ namespace HomeDesigner
       this.posTextBox.Text = Printer.printPos(this.data.pos);
       this.wallTextBox.Text = Printer.printWall(this.data.wall);
       this.sensortb.Text = Printer.printSensor(this.data.sensor);
-      this.pictureBox1.Image = (Image) this.data.drawPicture(this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked);
+      bitmapHouse=this.data.drawPicture(this.placepcb.Checked, this.sensorpcb.Checked, this.wallpcb.Checked);
+      this.pictureBox1.Image =(Image) this.data.drawPicture(this.placepcb.Checked,false, this.wallpcb.Checked);
+      
     }
 
     private void button1_Click(object sender, EventArgs e)
@@ -867,7 +1028,14 @@ namespace HomeDesigner
     private void label4_Click(object sender, EventArgs e)
     {
     }
-
+    private void checkBox1_ShowSensors(object sender, EventArgs e)
+    {
+      if (this.showSensors.Checked)
+        this.pictureBox1.Image = (Image) this.data.drawPicture(this.placepcb.Checked, true, this.wallpcb.Checked);
+      else
+        this.pictureBox1.Image = (Image) this.data.drawPicture(this.placepcb.Checked, false, this.wallpcb.Checked);
+    }
+    
     private void checkBox1_CheckedChanged(object sender, EventArgs e)
     {
       if (this.sensorCheckBox.Checked)
@@ -899,16 +1067,56 @@ namespace HomeDesigner
     }
     private void buttonDisegnaPredizione_Click(object sender, EventArgs e)
     {
+      if (!isLoaded)
+      {
+        MessageBox.Show("First of all you must load an house!");
+        return;
+      }
       string folderPath = "";
       FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
       folderBrowserDialog1.SelectedPath = "C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log";
+      String intervallo;
       if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+        FormInfo forminfo=new FormInfo();
+        forminfo.ShowDialog();
+        intervallo=forminfo.SelectedInterval;
+        if (intervallo.Equals("[interval_of_time]"))
+        {
+          MessageBox.Show("Before the plotting of the simulation, choose an interval of time to draw!");
+          return;
+        }
+         
         folderPath = folderBrowserDialog1.SelectedPath ;
+        if (!folderPath.Contains("C:\\Users\\Dario\\Desktop\\HomeDesigner\\bin\\Debug\\Log\\sim"))
+        {
+          MessageBox.Show("You must choose a valid simulation path!");
+
+          return;
+        }
         simulationBox.Text = " ";
-        simulationBox.Text += " "+folderPath.Substring(50);
+
+        simulationBox.Text+=" "+ folderPath.Substring(50);
         folderBrowserDialog1.Dispose();
         folderBrowserDialog1.Reset();
       }
+      else
+      {
+        return;
+      }
+      String t0= intervallo.Split('-')[0];
+      var now = DateTime.Now;
+      int hours = Convert.ToInt32(t0.Split(':')[0]);
+      int min = Convert.ToInt32(t0.Split(':')[1]);
+      int sec = Convert.ToInt32(t0.Split(':')[2]);
+
+  
+      DateTime timeInizio= new DateTime(now.Year, now.Month, now.Day,hours,min,sec);
+      String t1= intervallo.Split('-')[1];
+      hours = Convert.ToInt32(t1.Split(':')[0]);
+      min = Convert.ToInt32(t1.Split(':')[1]);
+      sec = Convert.ToInt32(t1.Split(':')[2]);
+      DateTime timeFine=      new DateTime(now.Year, now.Month, now.Day,hours,min,sec);
+
       string[] fileArray = Directory.GetFiles(folderPath);
       String filepath = "";
       foreach (String filename in fileArray)
@@ -955,7 +1163,7 @@ namespace HomeDesigner
      
 
 
-      this.refreshPrediction(dictionary);
+      this.refreshPrediction(dictionary,timeInizio, timeFine);
 
     }
 
@@ -974,7 +1182,6 @@ namespace HomeDesigner
       {
         while (sqReader.Read())
         {
-          
           list.Add( sqReader.GetString(0).ToString()+" "
                                                     +sqReader.GetString(1).ToString()+" "+sqReader.GetInt32(2).ToString());
         
@@ -993,8 +1200,10 @@ namespace HomeDesigner
 
       List<KeyValuePair<Position,Color>> value= new List<KeyValuePair<Position,Color>>();
       Position p0=new Position();
-      p0.x = Convert.ToDouble(list[0].Split(' ')[1]) ;
-      p0.y = Convert.ToDouble(list[0].Split(' ')[2]);
+      
+    
+      p0.x = double.Parse(list[0].Split(' ')[1],System.Globalization.CultureInfo.InvariantCulture) ;
+      p0.y = double.Parse(list[0].Split(' ')[2],System.Globalization.CultureInfo.InvariantCulture);
       KeyValuePair<Position, Color> keyValuePair= new KeyValuePair<Position, Color>(p0,idseg[idsegmento]);
 
       value.Add(keyValuePair);
@@ -1006,8 +1215,8 @@ namespace HomeDesigner
         {
            idsegmento=Convert.ToInt32(list[i].Split(' ')[3]);
            p0=new Position();
-          p0.x = Convert.ToDouble(list[i].Split(' ')[1]) ;
-          p0.y = Convert.ToDouble(list[i].Split(' ')[2]);
+          p0.x = double.Parse(list[i].Split(' ')[1],System.Globalization.CultureInfo.InvariantCulture) ;
+          p0.y = double.Parse(list[i].Split(' ')[2],System.Globalization.CultureInfo.InvariantCulture);
            keyValuePair= new KeyValuePair<Position, Color>(p0,idseg[idsegmento]);
           dictionary[ts].Add(keyValuePair);
         }
@@ -1016,8 +1225,8 @@ namespace HomeDesigner
           ts = list[i].Split(' ')[0];
           idsegmento=Convert.ToInt32(list[i].Split(' ')[3]);
           p0=new Position();
-          p0.x = Convert.ToDouble(list[i].Split(' ')[1]) ;
-          p0.y = Convert.ToDouble(list[i].Split(' ')[2]);
+          p0.x = double.Parse(list[i].Split(' ')[1],System.Globalization.CultureInfo.InvariantCulture) ;
+          p0.y = double.Parse(list[i].Split(' ')[2],System.Globalization.CultureInfo.InvariantCulture);
            value= new List<KeyValuePair<Position,Color>>();
           keyValuePair=new KeyValuePair<Position, Color>(p0,idseg[idsegmento]);
           value.Add(keyValuePair);
@@ -1030,38 +1239,74 @@ namespace HomeDesigner
     }
     private void buttonDisegna_Click(object sender, EventArgs e)
     {
-
-    
+      if (!isLoaded)
+      {
+        MessageBox.Show("First of all you must load an house!");
+        return;
+      }
       
       this.refreshSimulazione( );
     }
-    
-    private void buttonSimula_Click(object sender, EventArgs e)
+    private void zoomMenoButton_Click(object sender, EventArgs e)
     {
-     
-      if(!numeroPersoneBox.Text.Equals("[number_of_persons]"))
-      {
-        this.data.setPath();
-        int numeroPersone = Convert.ToInt32(numeroPersoneBox.Text);
-        this.data.simulationHandler(numeroPersone);
 
-      }
-      else
-      {
-        MessageBox.Show("Choose the number of people for the simulation!");
+      zoomFactor = 1.5f;
 
-      }
+      Bitmap bmpOriginale = new Bitmap(this.pictureBox1.Image);
+
+      Size newSize = new Size((int) (bmpOriginale.Width /this.zoomFactor), (int) (bmpOriginale.Height /this.zoomFactor));
+      Bitmap bmpNuovo = new Bitmap(bmpOriginale, newSize);
+      this.pictureBox1.Image = (Image) bmpNuovo;
 
       
+    }
+    private void zoomButton_Click(object sender, EventArgs e)
+    {
+
+      zoomFactor = 1.5f;
+
+        Bitmap bmpOriginale = new Bitmap(this.pictureBox1.Image);
+
+        Size newSize = new Size((int) (bmpOriginale.Width * this.zoomFactor), (int) (bmpOriginale.Height *this.zoomFactor));
+        Bitmap bmpNuovo = new Bitmap(bmpOriginale, newSize);
+        this.pictureBox1.Image = (Image) bmpNuovo;
+
+      
+    }
+
+    private void buttonSimula_Click(object sender, EventArgs e)
+    {
+      if (!isLoaded)
+      {
+        MessageBox.Show("First of all you must load an house!");
+        return;
+      }
+      FormSimulation formSimulation=new FormSimulation();
+      formSimulation.ShowDialog();
+      if (formSimulation.Utenti.Count == 0 )
+      {
+        return;
+      }
+     int giorniSimulazione = formSimulation.NumeroGiorni;
+         this.data.setPath();
+      Task task = Task.Run( () =>    this.data.simulationHandler(formSimulation.Utenti,formSimulation.TipoTraietoria, giorniSimulazione));      
+      if (task.IsCompleted)
+      {
+        task.Dispose();
+        task = null;
+      }
+
+
     }
 
     private void button1_Click_1(object sender, EventArgs e)
     {
       int num = (int) MessageBox.Show("Project info here.", "About");
     }
-
     private void cb1_SelectedIndexChanged(object sender, EventArgs e)
     {
     }
+
+    
   }
 }

@@ -247,7 +247,7 @@ def main():
         if( not listapuntatorilinee):
             datasetfile.close()
 
-#            traj_reconstructor.RecontructPathLogs(root.directory)
+            traj_reconstructor.RecontructPathLogs(root.directory)
             #trajectories_drawer.TestApp().run()
             return
 

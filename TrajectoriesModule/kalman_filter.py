@@ -2,7 +2,11 @@ from pykalman import KalmanFilter
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from numpy import *
+from numpy.linalg import inv
 from numpy  import array
+from filterpy.common import Q_discrete_white_noise
+
 
 import pylab as pl
 
@@ -49,14 +53,21 @@ def kalman_filter_position(cluster,position):
 
     time_before = time.time()
     n_real_time = 3
+    observation_covariance =[
 
+                     [ 100, 0],
+                     [ 0, 100]]
     kf3 = KalmanFilter(transition_matrices = transition_matrix,
                   observation_matrices = observation_matrix,
-                  initial_state_mean = initial_state_mean,
 
+                  initial_state_mean = initial_state_mean,
+                       observation_covariance= observation_covariance,
+                       em_vars=['transition_covariance', 'initial_state_covariance']
                )
     means, covariances = kf3.filter(measurements)
-    kf3 = kf3.em(measurements, n_iter=5)
+
+
+    kf3 = kf3.em(measurements, n_iter=8)
     (filtered_state_means, filtered_state_covariances) = kf3.filter(measurements)
     #print("Time to build and train kf3: %s seconds" % (time.time() - time_before))
     n_timesteps = 4

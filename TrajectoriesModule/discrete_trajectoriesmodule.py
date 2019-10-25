@@ -7,7 +7,7 @@ import random
 import math
 from datetime import datetime
 from datetime import timedelta
-import traj_reconstructor
+import discrete_traj_reconstructor
 import trajectories_drawer
 from tkinter import messagebox
 from tkinter import filedialog
@@ -25,6 +25,7 @@ def CalcolaMinimoTimestamp(listatimestamp):
     parsetm=tm.split(" ")[0]
     parsetime=tm.split(" ")[1]
 
+
     tm=parsetm.split("-")[2]+"."+parsetm.split("-")[1]+"."+parsetm.split("-")[0]+" "+parsetime
     timestampmin = datetime.strptime(tm,("%d.%m.%Y %H:%M:%S.%f"))
 
@@ -38,12 +39,12 @@ def CalcolaMinimoTimestamp(listatimestamp):
         timestamp = datetime.strptime(tm2, ("%d.%m.%Y %H:%M:%S.%f"))
         posizionemin2 = parsedstring2[2]
 
-
         if (timestamp <timestampmin ):
             timestampmin = timestamp
             c=i
             idfilemin= idfilemin2
             posizionemin=posizionemin2
+
 
 
     s=timestampmin.strftime("%Y-%m-%d\t%H:%M:%S.%f")+"_"+str(c)+"_"+str(idfilemin)+"_"+ posizionemin
@@ -56,8 +57,7 @@ def LeggiLinea(listafile):
 
         if (stringa == ""):
             continue
-        parsedline=stringa.split("\t")
-
+        parsedline=stringa.split('\t')
         linea =parsedline[0] + " "+parsedline[1]+"_"+str(i)+"_"+ parsedline[2]
 
         listaPuntatori.append(linea)
@@ -123,6 +123,7 @@ def main():
             j+=1
         if( not listapuntatorilinee):
             datasetfile.close()
+            #discrete_traj_reconstructor.RecontructPathLogs(root.directory)
 
             return
 
@@ -134,6 +135,7 @@ def main():
         idfiletsminimo=int(parsedstring[2])
         posizione=parsedstring[3]
 
+
         datasetfile.write(timestampmin+"\t"+posizione+"\t"+"ON"+"\n")
 
 
@@ -141,15 +143,23 @@ def main():
         ##file tsminimo leggo una nuova linea e lo schiaffo in listapuntatorilinee
 
         parsedline=listafile[idfiletsminimo].readline().split("\t")
-        line=parsedline[0]+" "+parsedline[1]
 
-        if(line=="" and len(listapuntatorilinee)!=0):
+        if(parsedline[0] == ""  and len(listapuntatorilinee)!=0):
+
             datasetfile.write( "\n")
-        if (line == "" and len(listapuntatorilinee)==0):
+        if (parsedline[0] == "" and len(listapuntatorilinee)==0):
+            #discrete_traj_reconstructor.RecontructPathLogs(root.directory)
+            return
+        if (parsedline[0] == ""):##fine del file
+            datasetfile.close()
+
+            #discrete_traj_reconstructor.RecontructPathLogs(root.directory)
+
+
             return
 
-        if (line != ""):
-                listapuntatorilinee.append(line+"_"+str(idfiletsminimo)+"_"+parsedline[2]+"_"+parsedline[3])
+        if (len(parsedline)!=0): ##file ancora non finito da leggere
+                listapuntatorilinee.append(parsedline[0]+" "+parsedline[1]+"_"+str(idfiletsminimo)+"_"+parsedline[2]+"_"+parsedline[3])
 
         del(listapuntatorilinee[filetsminimo])
 

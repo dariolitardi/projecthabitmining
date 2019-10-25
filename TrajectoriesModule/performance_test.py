@@ -10,24 +10,17 @@ from datetime import timedelta
 import sqlite3
 import time
 import kalman_filter
-class Cluster:
-    lista_posizioni=None
-    id_segment=0
-    isAssigned=False
 class Position:
     x = 0
     y = 0
-    id_seg=0
+    timestamp=None
+
 
 class Incrocio:
     position=None
     timestamp=None
-    listaCluster=None
-    id_val=0
-    count=0
-class Tupla:
-    id_seg=0
-    id_log=0
+
+
 
 def isContainedDuplicati(lista, pos):
     contatore=0
@@ -49,16 +42,7 @@ def GetDistanza(position1, position2):
     distanza = abs(float (math.sqrt((float (position1.x)-float (position2.x))**2 + (float (position1.y)- float (position2.y))**2)))
     return distanza
 
-def MioMetodo(listReal,listaCluster):
-    for cluster in listaCluster:
 
-            if (traiettoriaCoincidente(listReal, cluster.lista_posizioni) == True):
-                return True
-
-    for pos in listReal:
-        print(str(pos.x)+" "+str(pos.y)+" sbagliata")
-
-    return False
 
 
 def traiettoriaCoincidente(listReal, listRic):
@@ -70,72 +54,13 @@ def traiettoriaCoincidente(listReal, listRic):
     return True
 
 
-
-def Metodo(listaCluster,cl):
-    contatore = 0
-    for cluster in listaCluster:
-        if (cluster.lista_posizioni[0].x == cl.lista_posizioni[0].x
-                and cluster.lista_posizioni[0].y == cl.lista_posizioni[0].y ):
-            print(str(cluster.lista_posizioni[0].x)+ " "+str(cluster.lista_posizioni[0].y))
-            contatore += 1
-
-    return contatore
+def get_posizioni(cursor, incrocio,list_pos):
 
 
-def ContaDecisioni(arrayContatori,listaSegmentiReali, listaCluster):
-    print(len(listaSegmentiReali))
-    print(len(listaCluster))
-
-    listaClusterNuova=list()
-    for cluster in listaCluster:
-        if(Metodo(listaCluster,cluster)==1):
-            listaClusterNuova.append(cluster)
-
-    for cluster in listaCluster:
-        print("\n")
-
-        for pos in cluster.lista_posizioni:
-            print(str(pos.x) + " " + str(pos.y) + " fr")
-
-    for l in listaSegmentiReali:
-        print("\n")
-
-        for p in l:
-            print(str(p.x) + " " + str(p.y)+" r")
-
-
-    for listReal in listaSegmentiReali:
-            if(MioMetodo(listReal,listaCluster)==True):
-                arrayContatori[0] += 1
-            else:
-                arrayContatori[1] += 1
-
-    arrayContatori[2] += 1
-    return arrayContatori
-
-
-
-
-def getIdSegmento(id_log,listaId):
-    for elem in listaId:
-        if(elem.id_log==id_log):
-            return elem.id_seg
-
-def getIdLog(id_segmento,listaId):
-    for elem in listaId:
-        if(elem.id_seg==id_segmento):
-            return elem.id_log
-
-
-
-def getPosizioniReali(cursor, incrocio,tipo, id_log):
-
-
-    listaPos=list()
 
 
     t1 = datetime.strptime(incrocio.timestamp, ("%H:%M:%S.%f"))
-    t1 -= timedelta(milliseconds=2000)
+    t1 -= timedelta(milliseconds=1000)
     tm1 = t1.strftime("%H:%M:%S.%f")[:-3]
 
     t2 = datetime.strptime(incrocio.timestamp, ("%H:%M:%S.%f"))
@@ -154,25 +79,79 @@ def getPosizioniReali(cursor, incrocio,tipo, id_log):
     print("TEMPO "+tm3)
     '''
 
-    array=cursor.execute("SELECT valore_segmento.posizione, valore_segmento.id_segmento FROM valore INNER JOIN valore_segmento ON valore_segmento.id_valore = valore.id_valore WHERE valore.timestamp_pos = ? OR valore.timestamp_pos = ? OR  valore.timestamp_pos = ? OR  valore.timestamp_pos = ? AND  valore_segmento.id_segmento = ? ;" ,(tm1,incrocio.timestamp, tm2,tm3,id_log,)  ).fetchall()
+    array=cursor.execute("SELECT valore.posizione FROM valore WHERE valore.timestamp_pos = ? ;" ,(tm1,)  ).fetchall()
+    for i in range(0, len(array)):
+        list_sequence=list()
+        list_pos.append(list_sequence)
+    for j in range(0, len(array)):
+        s= array[j]
+        pos1=Position()
+        pos1.x=s[0].split(' ')[0]
+        pos1.y=s[0].split(' ')[1]
+        pos1.timestamp=tm1
+        if(j<len(list_pos)):
 
-    for row in array:
-        if(row[1]==id_log):
-            #print(row)
-            s = row[0].strip('\n').split(' ')
+            list_pos[j].append(pos1)
 
-            pos=Position()
+    array = cursor.execute("SELECT valore.posizione FROM valore WHERE valore.timestamp_pos = ? ;", (tm2,)).fetchall()
+    for j in range(0, len(array)):
+        s = array[j]
+        pos2 = Position()
+        pos2.x = s[0].split(' ')[0]
+        pos2.y = s[0].split(' ')[1]
+        pos2.timestamp = tm2
+        if(j<len(list_pos)):
 
-            pos.x=float(s[0].replace(',','.'))
-            pos.y=float(s[1].replace(',','.'))
+            list_pos[j].append(pos2)
 
-            if(GetDistanza(pos,incrocio.position)<50):
-                #print(str(incrocio.position.x) + " " + str(incrocio.position.y)+" "+incrocio.timestamp + " inc")
+    array = cursor.execute("SELECT valore.posizione FROM valore WHERE valore.timestamp_pos = ? ;", (incrocio.timestamp,)).fetchall()
+    for j in range(0, len(array)):
+        s = array[j]
+        pos_incrocio = Position()
 
-                #print(str(pos.x) + " " + str(pos.y) + " pos_suc" + tipo)
+        pos_incrocio.x = s[0].split(' ')[0]
+        pos_incrocio.y = s[0].split(' ')[1]
+        pos_incrocio.timestamp = incrocio.timestamp
+        if(j<len(list_pos)):
 
-                listaPos.append(pos)
-    return listaPos
+            list_pos[j].append(pos_incrocio)
+
+
+
+    array = cursor.execute("SELECT valore.posizione FROM valore WHERE valore.timestamp_pos = ? ;", (tm3,)).fetchall()
+    for j in range(0, len(array)):
+        s = array[j]
+        pos3 = Position()
+
+        pos3.x = s[0].split(' ')[0]
+        pos3.y = s[0].split(' ')[1]
+        pos3.timestamp = pos3.timestamp
+        if(j<len(list_pos)):
+            list_pos[j].append(pos3)
+    return list_pos
+def check_sequence(real_sequence, ric_sequence):
+    if(len(real_sequence)!=len(ric_sequence)):
+        return False
+    for i in range(0, len( real_sequence)):
+
+        if(real_sequence[i].x!=ric_sequence[i].x and
+                real_sequence[i].y != ric_sequence[i].y and real_sequence[i].timestamp!=ric_sequence[i].timestamp ):
+            return False
+
+    return True
+
+def count_decisions(list_real_pos, ric_sequence,arrayContatori):
+
+    for real_sequence in list_real_pos:
+            if(check_sequence(real_sequence, ric_sequence)):
+
+                arrayContatori[0]+=1
+                return
+
+    arrayContatori[1] += 1
+
+
+    return
 def getDuplicates(lista):
     duplicates = []
     for elem in lista:
@@ -191,78 +170,14 @@ def isContained(incrocio, lista_incroci):
 
     return False
 
-def CreaListaId(listaPosSuccessiveReali, listaPosSuccessiveRicostruite):
-    listaId=list()
-    for elem in listaPosSuccessiveReali:
-        for elemRic in listaPosSuccessiveRicostruite:
-            if (elem.x == elemRic.x and elem.y == elemRic.y):
-                tupla = Tupla()
+def test_kalmanfilter(lista_incroci,pathDirectoryLog):
+    conn_real = sqlite3.connect(pathDirectoryLog + '\\realTrajectoriesDB.db')
+    conn_real.set_authorizer(select_authorizer)
+    cursor_real = conn_real.cursor()
 
-                tupla.id_log = elem.id_seg
-
-                tupla.id_seg = elemRic.id_seg
-                if (isContainedDuplicatiId(listaId, tupla,tupla.id_log)):
-                    continue
-                print(str(tupla.id_log)+" "
-               +str( tupla.id_seg))
-                listaId.append(tupla)
-
-    print(str(len(listaId))+" leee")
-    return listaId
-def test_kalmanfilter(decisioniTotali,lista_incroci,pathDirectoryLog):
-    conn = sqlite3.connect(pathDirectoryLog + '\\realTrajectoriesDB.db')
-    conn.set_authorizer(select_authorizer)
-    cursor = conn.cursor()
-
-    connDBSim = sqlite3.connect(pathDirectoryLog + '\\trajectoriesDB.db')
-    connDBSim.set_authorizer(select_authorizer)
-    cursorSim = connDBSim.cursor()
-    cursor.execute("SELECT valore_segmento.posizione,valore_segmento.id_valore, valore.timestamp_pos, COUNT(*) count FROM valore INNER JOIN valore_segmento ON valore_segmento.id_valore = valore.id_valore GROUP BY valore_segmento.posizione, valore.timestamp_pos HAVING COUNT(*) > 1"  )
-
-
-
-
-
-    cr=conn.cursor()
-    cs=connDBSim.cursor()
-    #devo ottenere e far matchare gli id dei log reali con i segmenti
-    cr.execute("SELECT valore.posizione, valore_segmento.id_segmento FROM valore INNER JOIN valore_segmento ON valore_segmento.id_valore = valore.id_valore WHERE valore.timestamp_pos = ? ; ",("00:00:00.000",)  )
-    cs.execute("SELECT valore.posizione, valore_segmento.id_segmento FROM valore INNER JOIN valore_segmento ON valore_segmento.id_valore = valore.id_valore WHERE valore.timestamp_pos = ? ; ",("00:00:00.000",)  )
-    listaId=list()
-    listaReali=list()
-    listaRicostruite=list()
-    id_count=0
-    for row in cr:
-        s = row[0]
-        pos=Position()
-
-        pos.x = float(s.split(' ')[0])
-        pos.y =float( s.split(' ')[1])
-        pos.id_seg=int(row[1])
-        listaReali.append(pos)
-
-    for rowSim in cs:
-        s = rowSim[0]
-        pos=Position()
-
-        pos.x = float(s.split(' ')[0])
-        pos.y = float(s.split(' ')[1])
-        pos.id_seg=int(rowSim[1])
-        listaRicostruite.append(pos)
-
-    for elem in listaReali:
-        for elemRic in listaRicostruite:
-            if(elem.x==elemRic.x and elem.y==elemRic.y ):
-                tupla= Tupla()
-                tupla.id_log=elem.id_seg
-                tupla.id_seg=elemRic.id_seg
-                listaId.append(tupla)
-                print(str(tupla.id_log)+" "+str(tupla.id_seg))
-
-
-
-    listaRicostruite.clear()
-
+    conn_ric = sqlite3.connect(pathDirectoryLog + '\\trajectoriesDB.db')
+    conn_ric.set_authorizer(select_authorizer)
+    cursor_ric = conn_ric.cursor()
     decisioniGiuste=0
     decisioniSbagliate=0
     contatoreIncroci=0
@@ -272,39 +187,26 @@ def test_kalmanfilter(decisioniTotali,lista_incroci,pathDirectoryLog):
     arrayContatori.append(decisioniSbagliate)
     arrayContatori.append(contatoreIncroci)
 
-    flag=False
-    listaDuplicati=None
-    count=0
-    listaDuplicati=[]
-    listaSegmentiReali=list()
-    for inc in lista_incroci:
-        c4 = conn.cursor()
-        c5=connDBSim.cursor()
-        for id in listaId:
-            listaPosReali=getPosizioniReali(c4,inc,"re", id.id_log)
+    #devo ottenere e far matchare gli id dei log reali con i segmenti
+    for elem in lista_incroci:
+        list_real_pos=list()
+        list_ric_pos=list()
+        arrayContatori[2]+=1
+        get_posizioni(cursor_real,elem, list_real_pos)
+        get_posizioni(cursor_ric,elem, list_ric_pos)
+        for ric_sequence in list_ric_pos:
+            count_decisions(list_real_pos, ric_sequence, arrayContatori)
 
-            listaSegmentiReali.append(listaPosReali)
-
-
-
-        if (not listaSegmentiReali ):
-            break
+        list_real_pos.clear()
+        list_ric_pos.clear()
 
 
 
-            flag=False
-        print(len( inc.listaCluster))
-        print(str(len(listaSegmentiReali))+" "+str("pro"))
-        print(inc.timestamp)
-
-        arrayContatori=ContaDecisioni(arrayContatori,listaSegmentiReali, inc.listaCluster)
-        listaSegmentiReali.clear()
 
     print(str(arrayContatori[2])+" incroci")
 
     print(str(arrayContatori[0])+" giuste")
     print(str(arrayContatori[1])+" sbagliate")
 
-
-
-    conn.close()
+    conn_real.close()
+    conn_ric.close()

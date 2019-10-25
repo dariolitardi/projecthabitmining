@@ -21,38 +21,10 @@ p13 1400 750
 p14 1400 1350
 p11 1400 500
 p19 1400 150
-bathroom_sink 1700 450
-bed 1650 1250
-computer_chair 1650 900
-computer 1650 850
-dining_chair 300 900
-dining_table 300 1000
-entrace 750 250
-fridge 700 1250
-kitchen_sink 1300 1050
-micro 1300 850
-outside 1100 50
-start 750 150
-tv 150 250
-tv_chair 150 400
-wardrobe 1900 1050
-wc 1500 250
-bathtub 1850 250
-oven 1250 850
-kitchen_shelf 1300 1200
-shoe_shelf 1250 250
-exercise_place 150 1250
-chair 900 1000
-tv_kitchen 700 900
 library 1500 550
-dishwasher 1300 900
-washing_machine 1700 200
-cookers 1050 850
-closet 1950 650
-sofa 400 400
-shower_stall 1450 400
-coat_hangers 650 400
-table 850 1050
+wc 1500 250
+computer_chair 1650 900
+bed 1650 1250
 
 Walls
 p1 p2

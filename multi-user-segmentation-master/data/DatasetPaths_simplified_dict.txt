@@ -1,0 +1,11 @@
+A 		 bd2
+B 		 c1
+C 		 bd8
+D 		 bd4
+E 		 c2
+F 		 bd1
+G 		 bt2
+H 		 bd6
+I 		 bt4
+J 		 c3
+K 		 bd5
